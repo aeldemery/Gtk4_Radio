@@ -1,7 +1,10 @@
+subdir ('library')
+
 sources = files (
     'Main.vala',
     'MainWindow.vala',
     'Application.vala',
+    'Constants.vala',
 )
 
 dependencies = [
@@ -15,7 +18,7 @@ dependencies = [
 executable (
     meson.project_name (),
     resources,
-    sources: sources,
+    sources: [sources, lib_sources],
     dependencies: dependencies,
     install: true,
 )
