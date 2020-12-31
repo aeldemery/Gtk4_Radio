@@ -37,7 +37,7 @@ public class Gtk4Radio.Station : Object {
     /** URL to an icon or picture that represents the stream. (PNG, JPG) */
     public string favicon { get; set; default = ""; }
 
-    /** Tags of the stream with more information about it */
+    /** Tags of the stream with more information about it, split by comma. */
     public string tags { get; set; default = ""; }
 
     /** Deprecated: use countrycode instead, full name of the country.
@@ -51,7 +51,7 @@ public class Gtk4Radio.Station : Object {
     /** Full name of the entity where the station is located inside the country. */
     public string state { get; set; default = ""; }
 
-    /** Languages that are spoken in this stream. */
+    /** Languages that are spoken in this stream, split by comma. */
     public string language { get; set; default = ""; }
 
     /** Number of votes for this station. This number is by server and only ever increases.
@@ -59,8 +59,8 @@ public class Gtk4Radio.Station : Object {
      */
     public int votes { get; set; default = 0; }
 
-    /** Last time when the stream information was changed in the database. */
-    public string lastchangetime { get; set; default = ""; }
+    /** Last time when the stream information was changed in the database, in form YYYY-MM-DD HH:mm:ss. */
+    public GLib.DateTime lastchangetime { get; set; default = new GLib.DateTime.from_iso8601 ("1970-01-01 00:00:00", null); }
 
     /** The codec of this stream recorded at the last check. */
     public string codec { get; set; default = ""; }
@@ -69,25 +69,25 @@ public class Gtk4Radio.Station : Object {
     public int bitrate { get; set; default = 0; }
 
     /** Mark if this stream is using HLS distribution or non-HLS. */
-    public int hls { get; set; default = 0; }
+    public bool hls { get; set; default = false; }
 
     /** The current online/offline state of this stream.
      * This is a value calculated from multiple measure points in the internet.
      * The test servers are located in different countries. It is a majority vote.
      */
-    public int lastcheckok { get; set; default = 0; }
+    public bool lastcheckok { get; set; default = false; }
 
-    /** The last time when any radio-browser server checked the online state of this stream. */
-    public string lastchecktime { get; set; default = ""; }
+    /** The last time when any radio-browser server checked the online state of this stream, in form YYYY-MM-DD HH:mm:ss. */
+    public GLib.DateTime lastchecktime { get; set; default = new GLib.DateTime.from_iso8601 ("1970-01-01 00:00:00", null); }
 
-    /** The last time when the stream was checked for the online status with a positive result. */
-    public string lastcheckoktime { get; set; default = ""; }
+    /** The last time when the stream was checked for the online status with a positive result, in form YYYY-MM-DD HH:mm:ss. */
+    public GLib.DateTime lastcheckoktime { get; set; default = new GLib.DateTime.from_iso8601 ("1970-01-01 00:00:00", null); }
 
-    /** The last time when this server checked the online state and the metadata of this stream. */
-    public string lastlocalchecktime { get; set; default = ""; }
+    /** The last time when this server checked the online state and the metadata of this stream, in form YYYY-MM-DD HH:mm:ss. */
+    public GLib.DateTime lastlocalchecktime { get; set; default = new GLib.DateTime.from_iso8601 ("1970-01-01 00:00:00", null); }
 
-    /** The time of the last click recorded for this stream. */
-    public string clicktimestamp { get; set; default = ""; }
+    /** The time of the last click recorded for this stream, in form YYYY-MM-DD HH:mm:ss. */
+    public GLib.DateTime clicktimestamp { get; set; default = new GLib.DateTime.from_iso8601 ("1970-01-01 00:00:00", null); }
 
     /** Clicks within the last 24 hours. */
     public int clickcount { get; set; default = 0; }
@@ -113,14 +113,14 @@ public class Gtk4Radio.Station : Object {
         builder.append_printf ("state = %s\n", state);
         builder.append_printf ("language = %s\n", language);
         builder.append_printf ("votes = %s\n", votes.to_string ());
-        builder.append_printf ("lastchangetime = %s\n", lastchangetime);
+        builder.append_printf ("lastchangetime = %s\n", lastchangetime.to_string ());
         builder.append_printf ("codec = %s\n", codec);
         builder.append_printf ("bitrate = %s\n", bitrate.to_string ());
         builder.append_printf ("hls = %s\n", hls.to_string ());
         builder.append_printf ("lastcheckok = %s\n", lastcheckok.to_string ());
-        builder.append_printf ("lastchecktime = %s\n", lastchecktime);
-        builder.append_printf ("lastcheckoktime = %s\n", lastcheckoktime);
-        builder.append_printf ("clicktimestamp = %s\n", clicktimestamp);
+        builder.append_printf ("lastchecktime = %s\n", lastchecktime.to_string ());
+        builder.append_printf ("lastcheckoktime = %s\n", lastcheckoktime.to_string ());
+        builder.append_printf ("clicktimestamp = %s\n", clicktimestamp.to_string ());
         builder.append_printf ("clickcount = %s\n", clickcount.to_string ());
         builder.append_printf ("clicktrend = %s\n", clicktrend.to_string ());
 
