@@ -1,0 +1,19 @@
+public enum Gtk4Radio.OrderBy {
+    NAME, 
+    URL, 
+    HOMEPAGE, 
+    FAVICON, 
+    TAGS, 
+    COUNTRY, 
+    STATE, 
+    LANGUAGE, 
+    VOTES, 
+    CODEC, 
+    BITRATE, 
+    LASTCHECKOK, 
+    LASTCHECKTIME, 
+    CLICKTIMESTAMP, 
+    CLICKCOUNT, 
+    CLICKTREND, 
+    RANDOM
+}
