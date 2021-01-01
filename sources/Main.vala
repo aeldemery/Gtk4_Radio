@@ -1,3 +1,8 @@
+// Copyright (c) 2021 Ahmed Eldemery
+// 
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
 int main (string[] args) {
     var loop = new MainLoop ();
     var session = new Soup.Session ();

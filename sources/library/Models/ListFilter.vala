@@ -1,3 +1,8 @@
+// Copyright (c) 2021 Ahmed Eldemery
+// 
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
 /**
  * ListFilter to pass as an argument to list retrieval functions,
  * for example `list_countries`, `list_codecs`, `list_states` ...
