@@ -1,3 +1,9 @@
+// Copyright (c) 2021 Ahmed Eldemery
+// 
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+/** Client controller to access the web service. */
 public class Gtk4Radio.NetworkController {
     Soup.Session session;
     public NetworkController () {
