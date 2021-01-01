@@ -1,5 +1,8 @@
 lib_sources = files (
-    'Station.vala',
-    'StationSearchFilter.vala',
-    'OrderBy.vala',
+    'Models/Station.vala',
+    'Models/StationQueryFilter.vala',
+    'Models/ListFilter.vala',
+    'Models/StationsListModel.vala',
+
+    'Controllers/NetworkController.vala',
 )
