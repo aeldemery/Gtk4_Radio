@@ -8,11 +8,12 @@ sources = files (
 )
 
 dependencies = [
-    dependency ('glib-2.0'),
+    dependency ('glib-2.0', version: '>=2.66'),
     dependency ('gobject-2.0'),
-    dependency ('gtk4'),
-    dependency ('libsoup-2.4'),
+    dependency ('gtk4', version: '>=4.0'),
+    dependency ('libsoup-3.0'),
     dependency ('json-glib-1.0'),
+    dependency ('gee-0.8'),
 ]
 
 executable (
