@@ -9,6 +9,8 @@ public class Gtk4Radio.NetworkController {
     public NetworkController () {
         session = new Soup.Session ();
         session.user_agent = @"$APP_ID/$APP_VERSION";
+        session.max_conns = 8;
+        session.timeout = 15;
     }
 
     /**
@@ -17,7 +19,7 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of countries and station count for each.
      */
-    public Gee.HashMap<string, int> list_countries (ListFilter ? list_filter = null) {
+    public async Gee.HashMap<string, int> list_countries (ListFilter ? list_filter = null) {
         return new Gee.HashMap<string, int> ();
     }
 
@@ -27,7 +29,7 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of countries and station count for each.
      */
-    public Gee.HashMap<string, int> list_countries_by_code (ListFilter ? list_filter = null) {
+    public async Gee.HashMap<string, int> list_countries_by_code (ListFilter ? list_filter = null) {
         return new Gee.HashMap<string, int> ();
     }
 
@@ -37,7 +39,7 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of codecs and station count for each.
      */
-    public Gee.HashMap<string, int> list_codecs (ListFilter ? list_filter = null) {
+    public async Gee.HashMap<string, int> list_codecs (ListFilter ? list_filter = null) {
         return new Gee.HashMap<string, int> ();
     }
 
@@ -49,7 +51,7 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of codecs and station count for each.
      */
-    public Gee.HashMap<string, int> list_states (ListFilter ? list_filter = null) {
+    public async Gee.HashMap<string, int> list_states (ListFilter ? list_filter = null) {
         return new Gee.HashMap<string, int> ();
     }
 
@@ -59,7 +61,7 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of languages and station count for each.
      */
-    public Gee.HashMap<string, int> list_languages (ListFilter ? list_filter = null) {
+    public async Gee.HashMap<string, int> list_languages (ListFilter ? list_filter = null) {
         return new Gee.HashMap<string, int> ();
     }
 
@@ -69,7 +71,7 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of tags and station count for each.
      */
-    public Gee.HashMap<string, int> list_tags (ListFilter ? list_filter = null) {
+    public async Gee.HashMap<string, int> list_tags (ListFilter ? list_filter = null) {
         return new Gee.HashMap<string, int> ();
     }
 
@@ -81,7 +83,7 @@ public class Gtk4Radio.NetworkController {
      * @param query_filter Instance of {@link StationQueryFilter}, if null will return all stations.
      * @return list of stations.
      */
-    public Gee.ArrayList<Station> list_stations (SearchBy ? search_by = null, StationQueryFilter ? query_filter = null) {
+    public async Gee.ArrayList<Station> list_stations (SearchBy ? search_by = null, StationQueryFilter ? query_filter = null) {
         return new Gee.ArrayList<Station> ();
     }
 
@@ -91,7 +93,7 @@ public class Gtk4Radio.NetworkController {
      * @param search_filter Instance of {@link StationQueryFilter}, if null will return all stations.
      * @return {@link GLib.InputStream} of Stations.
      */
-    public GLib.InputStream list_stations_stream (SearchBy ? search_by = null, StationQueryFilter ? query_filter = null) {
+    public async GLib.InputStream list_stations_stream (SearchBy ? search_by = null, StationQueryFilter ? query_filter = null) {
         return new GLib.DataInputStream (null);
     }
 
@@ -102,7 +104,7 @@ public class Gtk4Radio.NetworkController {
      * @param number of wanted stations.
      * @return list of stations by clicks.
      */
-    public Gee.ArrayList<Station> list_stations_by_clicks (uint num_stations) {
+    public async Gee.ArrayList<Station> list_stations_by_clicks (uint num_stations) {
         return new Gee.ArrayList<Station> ();
     }
 
@@ -112,7 +114,7 @@ public class Gtk4Radio.NetworkController {
      * @param number of wanted stations.
      * @return list of stations by votes.
      */
-    public Gee.ArrayList<Station> list_stations_by_votes (uint num_stations) {
+    public async Gee.ArrayList<Station> list_stations_by_votes (uint num_stations) {
         return new Gee.ArrayList<Station> ();
     }
 
@@ -122,7 +124,7 @@ public class Gtk4Radio.NetworkController {
      * @param number of wanted stations.
      * @return list of stations last checked.
      */
-    public Gee.ArrayList<Station> list_stations_by_recent_click (uint num_stations) {
+    public async Gee.ArrayList<Station> list_stations_by_recent_click (uint num_stations) {
         return new Gee.ArrayList<Station> ();
     }
 
@@ -132,7 +134,7 @@ public class Gtk4Radio.NetworkController {
      * @param number of wanted stations.
      * @return list of stations recently changed.
      */
-    public Gee.ArrayList<Station> list_stations_by_recent_change (uint num_stations) {
+    public async Gee.ArrayList<Station> list_stations_by_recent_change (uint num_stations) {
         return new Gee.ArrayList<Station> ();
     }
 
@@ -144,7 +146,7 @@ public class Gtk4Radio.NetworkController {
      * @param number of wanted stations.
      * @return list of stations in need for improvement.
      */
-    public Gee.ArrayList<Station> list_improvable_stations (uint num_stations) {
+    public async Gee.ArrayList<Station> list_improvable_stations (uint num_stations) {
         return new Gee.ArrayList<Station> ();
     }
 
@@ -154,7 +156,7 @@ public class Gtk4Radio.NetworkController {
      * @param number of wanted stations.
      * @return list of brocken stations.
      */
-    public Gee.ArrayList<Station> list_brocken_stations (uint num_stations) {
+    public async Gee.ArrayList<Station> list_brocken_stations (uint num_stations) {
         return new Gee.ArrayList<Station> ();
     }
 
