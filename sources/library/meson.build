@@ -3,6 +3,9 @@ lib_sources = files (
     'Models/StationQueryFilter.vala',
     'Models/ListFilter.vala',
     'Models/StationsListModel.vala',
+    'Models/ErrorDomain.vala',
+    'Models/ServerStats.vala',
 
     'Controllers/NetworkController.vala',
+    'Controllers/EndpointDiscovery.vala',
 )
