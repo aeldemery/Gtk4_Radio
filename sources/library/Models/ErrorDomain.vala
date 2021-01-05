@@ -6,7 +6,7 @@
 /**
  * Possible Errors
  */
-public errordomain Gtk4Demo.Error {
+public errordomain Gtk4Radio.Error {
     Unknown,
     ParsingError,
     NetworkError,
