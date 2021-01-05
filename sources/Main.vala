@@ -4,22 +4,13 @@
 // https://opensource.org/licenses/MIT
 
 int main (string[] args) {
-    var resolver = GLib.Resolver.get_default ();
-    string[] ip_addresses = {};
-    string[] str_records = {};
     try {
-        var addresses = resolver.lookup_by_name (Gtk4Radio.API_URL);
-        var records = resolver.lookup_service ("api", "tcp", "radio-browser.info");
-        foreach (var add in addresses) {
-            ip_addresses += add.to_string ();
-        }
+        var endpoint = new Gtk4Radio.EndpoinDiscovery (Gtk4Radio.USER_AGENT);
+        var urls = endpoint.get_api_urls ("api", "tcp", "radio-browser.info");
 
-        foreach (var record in records) {
-            str_records += record.get_hostname ();
+        foreach (var url in urls) {
+            print (url + "\n");
         }
-
-        print (ip_addresses[0] + "\n");
-        print (str_records[0] + "\n");
 
         // var session = new Soup.Session ();
         // var message = new Soup.Message ("GET", ip_addresses[0]);
@@ -33,17 +24,17 @@ int main (string[] args) {
 
     // return 0;
 
-    var loop = new MainLoop ();
-    var session = new Soup.Session ();
-    GLib.Bytes bytes = new GLib.Bytes (null);
-    get_uri_contents.begin (session, str_records[0], (obj, res) => {
-        bytes = get_uri_contents.end (res);
-        loop.quit ();
-    });
-    loop.run ();
-    if (bytes != null) {
-        print ((string) bytes.get_data ());
-    }
+    // var loop = new MainLoop ();
+    // var session = new Soup.Session ();
+    // GLib.Bytes bytes = new GLib.Bytes (null);
+    // get_uri_contents.begin (session, str_records[0], (obj, res) => {
+    // bytes = get_uri_contents.end (res);
+    // loop.quit ();
+    // });
+    // loop.run ();
+    // if (bytes != null) {
+    // print ((string) bytes.get_data ());
+    // }
     return 0;
 }
 
