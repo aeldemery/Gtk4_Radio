@@ -6,7 +6,18 @@
 /** Client controller to access the web service. */
 public class Gtk4Radio.NetworkController {
     Soup.Session session;
-    public NetworkController () {
+    string user_agent;
+    string api_url;
+
+    /**
+    * {@inheritDoc}
+    * @param api_url Endpoint API url.
+    * @param user_agent "App/Version"
+     */
+    public NetworkController (string api_url, string user_agent) {
+        this.api_url = api_url;
+        this.user_agent = user_agent;
+
         session = new Soup.Session ();
         session.user_agent = @"$APP_ID/$APP_VERSION";
         session.max_conns = 8;
@@ -84,7 +95,36 @@ public class Gtk4Radio.NetworkController {
      * @return list of stations.
      */
     public async Gee.ArrayList<Station> list_stations (SearchBy ? search_by = null, StationQueryFilter ? query_filter = null) {
-        return new Gee.ArrayList<Station> ();
+        var result = new Gee.ArrayList<Station> ();
+
+        var search = api_url + "/json/stations/" + Gtk4Radio.SearchBy.COUNTRYCODE_EXACT.to_string() + "/EG";
+        print (search + "\n");
+        var msg = new Soup.Message ("POST", search);
+        try {
+            var input_stream = yield session.send_async (msg, Priority.DEFAULT);
+            var data_stream = new GLib.DataInputStream (input_stream);
+            var string_builder = new StringBuilder ();
+            string line = null;
+
+            while ((line = yield data_stream.read_line_async (Priority.DEFAULT)) != null) {
+                string_builder.append (line);
+                string_builder.append_c ('\n');
+            }
+            
+            var parser = new Json.Parser ();
+            parser.load_from_data (string_builder.str);
+            var root = parser.get_root ();
+            var arr = root.get_array ();
+            arr.foreach_element ((array, index, element_node) => { 
+                var station = (Station) Json.gobject_deserialize (typeof (Station), element_node);
+                assert_nonnull (station);
+                result.add (station);
+            });
+
+        } catch (GLib.Error err) {
+            critical ("Couldn't send request: %s\n", err.message);
+        }
+        return result;
     }
 
     /**
