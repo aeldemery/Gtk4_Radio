@@ -38,6 +38,7 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
             }
         } catch (GLib.Error error) {
             critical ("Unknown Host Name: " + error.message);
+            throw new Error.NetworkError ("Could'n retrieve list of servers");
         }
         return result;
     }
