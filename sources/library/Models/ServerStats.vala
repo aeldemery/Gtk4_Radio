@@ -15,4 +15,22 @@ public class Gtk4Radio.ServerStats : Object {
     public string status { get; set; default = ""; }
     public int supported_version { get; set; default = 0; }
     public int tags { get; set; default = 0; }
+
+    public string to_string () {
+        var builder = new StringBuilder ();
+
+        builder.append_printf ("Status: %s\n", status);
+        builder.append_printf ("Software version: %s\n", software_version);
+        builder.append_printf ("Supported version: %d\n", supported_version);
+
+        builder.append_printf ("Number of Stations: %d\n", stations);
+        builder.append_printf ("Number of brocken Stations: %d\n", stations_broken);
+        builder.append_printf ("Number of Countries: %d\n", countries);
+        builder.append_printf ("Number of Languages: %d\n", languages);
+        builder.append_printf ("Number of Tags: %d\n", tags);
+
+        builder.append_printf ("Clicks last day: %d\n", clicks_last_day);
+        builder.append_printf ("Clicks last hour: %d\n", clicks_last_hour);
+        return builder.str;
+    }
 }
