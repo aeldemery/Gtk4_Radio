@@ -4,13 +4,19 @@
 // https://opensource.org/licenses/MIT
 
 int main (string[] args) {
+    GLib.Intl.setlocale ();
     try {
         var endpoint = new Gtk4Radio.EndpoinDiscovery (Gtk4Radio.USER_AGENT);
         var urls = endpoint.get_api_urls ("api", "tcp", "radio-browser.info");
+        // var stats_url = urls[0] + "/json/stats";
 
-        foreach (var url in urls) {
-            print (url + "\n");
-        }
+        // var server_stats = endpoint.get_server_stats (stats_url);
+        // print (server_stats.to_string ());
+
+        var url = endpoint.get_fastest_api_url (urls);
+        
+        print (url);
+        
 
         // var session = new Soup.Session ();
         // var message = new Soup.Message ("GET", ip_addresses[0]);
@@ -18,7 +24,7 @@ int main (string[] args) {
         // var data_input_stream = new GLib.DataInputStream (input_stream);
         // var str = data_input_stream.read_line_utf8 ();
         // print ("s%\n", str);
-    } catch (Error err) {
+    } catch (Gtk4Radio.Error err) {
         print (err.message);
     }
 
