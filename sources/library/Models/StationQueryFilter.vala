@@ -126,5 +126,25 @@ public enum Gtk4Radio.SearchBy {
     LANGUAGE,
     LANGUAGE_EXACT,
     TAG,
-    TAG_EXACT,
+    TAG_EXACT;
+
+    public string to_string () {
+        switch (this) {
+            case UUID: return "byuuid";
+            case NAME: return "byname";
+            case NAME_EXACT: return "bynameexact";
+            case CODEC: return "bycodec";
+            case CODEC_EXACT: return "bycodecexact";
+            case COUNTRY: return "bycountry";
+            case COUNTRY_EXACT: return "bycountryexact";
+            case COUNTRYCODE_EXACT: return "bycountrycodeexact";
+            case STATE: return "bystate";
+            case STATE_EXACT: return "bystateexact";
+            case LANGUAGE: return "bylanguage";
+            case LANGUAGE_EXACT: return "bylanguageexact";
+            case TAG: return "bytag";
+            case TAG_EXACT: return "bytagexact";
+            default: return "";
+        }
+    }
 }
