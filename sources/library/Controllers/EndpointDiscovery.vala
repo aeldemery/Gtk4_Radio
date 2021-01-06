@@ -40,9 +40,9 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
         }
 
         try {
-            var records = resolver.lookup_service (service, protocol, domain);
+            GLib.List<GLib.SrvTarget> records = resolver.lookup_service (service, protocol, domain);
 
-            foreach (var record in records) {
+            foreach (GLib.SrvTarget record in records) {
                 result.add (prefix + record.get_hostname ());
             }
         } catch (GLib.Error error) {
@@ -67,10 +67,10 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
 
         var timer = new GLib.Timer ();
 
-        foreach (var url in urls) {
+        foreach (string url in urls) {
             timer.start ();
             try {
-                var stats = this.get_server_stats (url + "/json/stats");
+                ServerStats stats = this.get_server_stats (url + "/json/stats");
                 if (stats.status == "OK") {
                     timer.stop ();
                     elapsed_time = timer.elapsed ();
@@ -106,16 +106,16 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
         string content_type;
 
         try {
-            var bytes = session.load_uri_bytes (api_url, null, out content_type);
+            GLib.Bytes bytes = session.load_uri_bytes (api_url, null, out content_type);
             var str = (string) bytes.get_data ();
 
             try {
                 var parser = new Json.Parser ();
                 parser.load_from_data (str);
 
-                var root = parser.get_root ();
+                Json.Node ? root = parser.get_root ();
 
-                var result = (Gtk4Radio.ServerStats)Json.gobject_deserialize (typeof (Gtk4Radio.ServerStats), root);
+                var result = (ServerStats) Json.gobject_deserialize (typeof (Gtk4Radio.ServerStats), root);
                 return result;
             } catch (GLib.Error err) {
                 critical ("Failed to parse Json object to ServerStats: %s", err.message);
