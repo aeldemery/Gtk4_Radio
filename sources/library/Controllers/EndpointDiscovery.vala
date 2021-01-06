@@ -56,10 +56,11 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
      * Loop through all available endpoint addresses and determine the fastest server.
      *
      * @param urls ArrayList of string urls to examin.
+     * @param add_https_prefix add "https://" to the returned host name
      * @return string the calculated fast responding server.
      * @throw NetworkError
      */
-    public string get_fastest_api_url (Gee.ArrayList<string> urls) throws Gtk4Radio.Error {
+    public string get_fastest_api_url (Gee.ArrayList<string> urls, bool add_https_prefix = true) throws Gtk4Radio.Error {
         double elapsed_time;
         double fastest_time = double.MAX;
         string fastest_url = "";
@@ -87,7 +88,11 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
                 throw new Error.NetworkError ("Couldn't retrieve server stats");
             }
         }
-        return fastest_url;
+        if (add_https_prefix && !fastest_url.has_prefix ("https://")) {
+            return "https://" + fastest_url;
+        } else {
+            return fastest_url;
+        }
     }
 
     /**
