@@ -8,15 +8,29 @@ int main (string[] args) {
     try {
         var endpoint = new Gtk4Radio.EndpoinDiscovery (Gtk4Radio.USER_AGENT);
         var urls = endpoint.get_api_urls ("api", "tcp", "radio-browser.info");
+
+        // var search_by = Gtk4Radio.SearchBy.NAME;
+        // print (search_by.to_string ());
         // var stats_url = urls[0] + "/json/stats";
 
         // var server_stats = endpoint.get_server_stats (stats_url);
         // print (server_stats.to_string ());
 
         var url = endpoint.get_fastest_api_url (urls);
-        
-        print (url);
-        
+        // print (url);
+
+        var controller = new Gtk4Radio.NetworkController (url, Gtk4Radio.USER_AGENT);
+
+        var loop = new MainLoop ();
+        controller.list_stations.begin (null, null, (obj, res) => {
+            var data = controller.list_stations.end (res);
+            foreach (var station in data) {
+                print (station.to_string());
+            }
+            loop.quit ();
+        } );
+        loop.run ();
+
 
         // var session = new Soup.Session ();
         // var message = new Soup.Message ("GET", ip_addresses[0]);
