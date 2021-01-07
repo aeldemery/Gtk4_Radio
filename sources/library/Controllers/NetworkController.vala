@@ -168,6 +168,7 @@ public class Gtk4Radio.NetworkController {
 
             if (check_response_status (msg) == true) {
                 try {
+                    this.started_parsing ();
                     yield parser.load_from_stream_async (stream);
 
                     Json.Node ? root = parser.get_root ();
@@ -178,6 +179,7 @@ public class Gtk4Radio.NetworkController {
                                 var station = (Station) Json.gobject_deserialize (typeof (Station), element);
                                 result.add (station);
                             });
+                            this.finished_parsing ();
                         }
                     }
                 } catch (GLib.Error err) {
