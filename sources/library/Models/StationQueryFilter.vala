@@ -82,6 +82,40 @@ public class Gtk4Radio.StationQueryFilter : Object {
 
     /** do list/not list broken stations, default is false */
     public bool hide_brocken { get; set; default = false; }
+
+    /**
+     * Build a string containing pairs of "key=value",
+     * if multiple have been changed from the default, then append "&" as a separator
+     */
+    public string build_request_string () {
+        var result = new StringBuilder ("?");
+
+        // Test if all members have been set
+        if (uuid != "") result.append_printf ("uuid=%s&" + uuid);
+        if (name != "") result.append_printf ("name=%s&" + name);
+        if (name_exact == true) result.append ("nameExact=true&");
+        if (country != "") result.append_printf ("country=%s&" + country);
+        if (country_exact == true) result.append ("countryExact=true&");
+        if (countrycode != "") result.append_printf ("countrycode=%s&" + countrycode);
+        if (countrycode_exact == true) result.append ("countrycodeExact=true&");
+        if (state != "") result.append_printf ("state=%s&", state);
+        if (state_exact == true) result.append ("stateExact=true&");
+        if (language != "") result.append_printf ("uuid=%s&", language);
+        if (language_exact == true) result.append ("languageExact=true&");
+        if (tag != "") result.append_printf ("uuid=%s&", tag);
+        if (tag_exact == true) result.append ("tagExact=true&");
+        if (tag_list != "") result.append_printf ("tagList=%s&", tag_list);
+        if (codec != "") result.append_printf ("codec=%s&", codec);
+        if (bitrate_min != 0) result.append_printf ("bitrateMin=%u&", bitrate_min);
+        if (bitrate_max != 1000000) result.append_printf ("bitrateMax=%u&", bitrate_max);
+        if (order != StationOrderBy.NAME) result.append_printf ("order=%s&", order.to_string ());
+        if (reverse == true) result.append ("reverse=true&");
+        if (offset != 0) result.append_printf ("offset=%u&", offset);
+        if (limit != 100000) result.append_printf ("limit=%u&", limit);
+        if (hide_brocken == true) result.append ("hidebrocken=true&");
+
+        return result.str;
+    }
 }
 
 /**
@@ -104,7 +138,15 @@ public enum Gtk4Radio.StationOrderBy {
     CLICKTIMESTAMP,
     CLICKCOUNT,
     CLICKTREND,
-    RANDOM,
+    RANDOM;
+
+    /** Return string representions of enum members. */
+    public string to_string () {
+        EnumClass enumc = (EnumClass) typeof (StationOrderBy).class_ref ();
+        unowned EnumValue ? eval = enumc.get_value (this);
+        return_val_if_fail (eval != null, null);
+        return eval.value_nick;
+    }
 }
 
 /**
@@ -128,6 +170,7 @@ public enum Gtk4Radio.SearchBy {
     TAG,
     TAG_EXACT;
 
+    /** Return string representions of enum members. */
     public string to_string () {
         switch (this) {
             case UUID: return "byuuid";
