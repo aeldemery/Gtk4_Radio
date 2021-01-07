@@ -6,6 +6,7 @@ sources = files (
     'Constants.vala',
 
     'Views/MainWindow.vala',
+    'Views/StationColumnView.vala',
 )
 
 dependencies = [
