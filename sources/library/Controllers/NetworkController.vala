@@ -148,8 +148,35 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of stations in Gee.ArrayList.
      */
-    public async Gee.ArrayList<Station> list_all_stations () {
+    public async Gee.ArrayList<Station> list_all_stations () throws Gtk4Radio.Error {
         var result = new Gee.ArrayList<Station> ();
+        var parser = new Json.Parser ();
+        var msg = new Soup.Message ("POST", api_url + "/json/stations");
+
+        try {
+            GLib.InputStream stream = yield session.send_async (msg, Priority.DEFAULT);
+
+            if (check_response_status (msg) == true) {
+                try {
+                    yield parser.load_from_stream_async (stream);
+
+                    Json.Node ? root = parser.get_root ();
+                    if (root != null) {
+                        Json.Array ? arr = root.get_array ();
+                        if (arr != null) {
+                            arr.foreach_element ((array, index, element) => {
+                                var station = (Station) Json.gobject_deserialize (typeof (Station), element);
+                                result.add (station);
+                            });
+                        }
+                    }
+                } catch (GLib.Error err) {
+                    throw new Error.ParsingError ("NetworkController:list_all_stations:Couldn't parse Json: %s\n", err.message);
+                }
+            }
+        } catch (GLib.Error err) {
+            throw new Error.NetworkError ("NetworkController:list_all_stations:Couldn't get stations: %s\n", err.message);
+        }
         return result;
     }
 
@@ -251,5 +278,13 @@ public class Gtk4Radio.NetworkController {
 
     // Private methods
     async void send_message_request_async (string resource) throws Gtk4Radio.Error {
+    }
+
+    bool check_response_status (Soup.Message msg) {
+        if (msg.status_code != Soup.Status.OK) {
+            throw new Error.NetworkError ("NetworkControllert:check_response_status: %s\n", msg.reason_phrase);
+        } else {
+            return true;
+        }
     }
 }
