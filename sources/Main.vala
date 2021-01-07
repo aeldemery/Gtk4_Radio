@@ -7,7 +7,7 @@ int main (string[] args) {
     GLib.Intl.setlocale ();
     try {
         var endpoint = new Gtk4Radio.EndpoinDiscovery (Gtk4Radio.USER_AGENT);
-        var urls = endpoint.get_api_urls ("api", "tcp", "radio-browser.info");
+        var urls = endpoint.get_api_urls ("radio-browser.info", "api");
 
         // var search_by = Gtk4Radio.SearchBy.NAME;
         // print (search_by.to_string ());
@@ -17,19 +17,19 @@ int main (string[] args) {
         // print (server_stats.to_string ());
 
         var url = endpoint.get_fastest_api_url (urls);
-        // print (url);
+        print (url);
 
-        var controller = new Gtk4Radio.NetworkController (url, Gtk4Radio.USER_AGENT);
+        // var controller = new Gtk4Radio.NetworkController (url, Gtk4Radio.USER_AGENT);
 
-        var loop = new MainLoop ();
-        controller.list_stations.begin (null, null, (obj, res) => {
-            var data = controller.list_stations.end (res);
-            foreach (var station in data) {
-                print (station.to_string());
-            }
-            loop.quit ();
-        } );
-        loop.run ();
+        // var loop = new MainLoop ();
+        // controller.list_stations.begin (null, null, (obj, res) => {
+        // var data = controller.list_stations.end (res);
+        // foreach (var station in data) {
+        // print (station.to_string ());
+        // }
+        // loop.quit ();
+        // } );
+        // loop.run ();
 
 
         // var session = new Soup.Session ();
@@ -60,15 +60,15 @@ int main (string[] args) {
 
 // var app = new Gtk4Radio.RadioApplication ();
 // return app.run (args);
-async GLib.Bytes ? get_uri_contents (Soup.Session session, string address) {
-    var content_type = "";
-    try {
-        var api_address = "https://" + address + "/json/stations";
-        var bytes = yield session.load_uri_bytes_async (api_address, Priority.DEFAULT, null, out content_type);
+// async GLib.Bytes ? get_uri_contents (Soup.Session session, string address) {
+// var content_type = "";
+// try {
+// var api_address = "https://" + address + "/json/stations";
+// var bytes = yield session.load_uri_bytes_async (api_address, Priority.DEFAULT, null, out content_type);
 
-        return bytes;
-    } catch (Error err) {
-        warning ("Error: %s\n", err.message);
-        return null;
-    }
-}
+// return bytes;
+// } catch (Error err) {
+// warning ("Error: %s\n", err.message);
+// return null;
+// }
+// }
