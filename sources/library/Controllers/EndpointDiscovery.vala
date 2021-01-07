@@ -30,7 +30,10 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
      * @return ArrayList of all available servers, there is no garantee that all are working.
      * @throw NetworkError
      */
-    public Gee.ArrayList<string> get_api_urls (string domain, string service, NetworkProtocol protocol = NetworkProtocol.TCP, bool add_https_prefix = true) throws Gtk4Radio.Error {
+    public Gee.ArrayList<string> get_api_urls (string domain,
+                                               string service,
+                                               NetworkProtocol protocol = NetworkProtocol.TCP,
+                                               bool add_https_prefix = true) throws Gtk4Radio.Error {
         var result = new Gee.ArrayList<string> ();
         var resolver = GLib.Resolver.get_default ();
 
@@ -108,7 +111,7 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
             var str = (string) bytes.get_data ();
 
             try {
-                Json.Node root = (!) Json.from_string (str);
+                Json.Node root = (!)Json.from_string (str);
 
                 var result = (ServerStats) Json.gobject_deserialize (typeof (Gtk4Radio.ServerStats), root);
                 return result;
@@ -169,29 +172,9 @@ public enum Gtk4Radio.NetworkProtocol {
     TFTP;
 
     public string to_string () {
-        switch (this) {
-            case TCP: return "tcp";
-            case IP: return "ip";
-            case UDP: return "udp";
-            case POP: return "pop";
-            case SMTP: return "smtp";
-            case FTP: return "ftp";
-            case HTTP: return "http";
-            case HTTPS: return "https";
-            case TELNET: return "telnet";
-            case GOPHER: return "gopher";
-            case ARP: return "arp";
-            case DHCP: return "dhcp";
-            case IMAP4: return "imap4";
-            case SIP: return "sip";
-            case RTP: return "rtp";
-            case RLP: return "rlp";
-            case RAP: return "rap";
-            case L2TP: return "l2tp";
-            case PPTP: return "pptp";
-            case SNMP: return "snmp";
-            case TFTP: return "tftp";
-            default: return "";
-        }
+        EnumClass enumc = (EnumClass) typeof (NetworkProtocol).class_ref ();
+        unowned EnumValue? eval = enumc.get_value (this);
+        return_val_if_fail (eval != null, null);
+        return eval.value_nick;
     }
 }
