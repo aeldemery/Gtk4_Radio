@@ -156,6 +156,7 @@ public enum Gtk4Radio.StationOrderBy {
  */
 public enum Gtk4Radio.SearchBy {
     UUID,
+    URL,
     NAME,
     NAME_EXACT,
     CODEC,
@@ -174,6 +175,7 @@ public enum Gtk4Radio.SearchBy {
     public string to_string () {
         switch (this) {
             case UUID: return "byuuid";
+            case URL: return "byurl";
             case NAME: return "byname";
             case NAME_EXACT: return "bynameexact";
             case CODEC: return "bycodec";
