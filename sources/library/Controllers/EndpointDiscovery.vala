@@ -173,7 +173,7 @@ public enum Gtk4Radio.NetworkProtocol {
 
     public string to_string () {
         EnumClass enumc = (EnumClass) typeof (NetworkProtocol).class_ref ();
-        unowned EnumValue? eval = enumc.get_value (this);
+        unowned EnumValue ? eval = enumc.get_value (this);
         return_val_if_fail (eval != null, null);
         return eval.value_nick;
     }
