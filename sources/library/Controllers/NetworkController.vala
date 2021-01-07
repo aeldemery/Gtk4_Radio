@@ -10,9 +10,9 @@ public class Gtk4Radio.NetworkController {
     string api_url;
 
     /**
-    * {@inheritDoc}
-    * @param api_url Endpoint API url.
-    * @param user_agent "App/Version"
+     * {@inheritDoc}
+     * @param api_url Endpoint API url.
+     * @param user_agent "App/Version"
      */
     public NetworkController (string api_url, string user_agent) {
         this.api_url = api_url;
@@ -30,7 +30,7 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of countries and station count for each.
      */
-    public async Gee.HashMap<string, int> list_countries (ListFilter ? list_filter = null) {
+    public async Gee.HashMap<string, int> list_countries (ListFilter ? list_filter = null) throws Gtk4Radio.Error {
         return new Gee.HashMap<string, int> ();
     }
 
@@ -40,7 +40,7 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of countries and station count for each.
      */
-    public async Gee.HashMap<string, int> list_countries_by_code (ListFilter ? list_filter = null) {
+    public async Gee.HashMap<string, int> list_countries_by_code (ListFilter ? list_filter = null) throws Gtk4Radio.Error {
         return new Gee.HashMap<string, int> ();
     }
 
@@ -50,7 +50,7 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of codecs and station count for each.
      */
-    public async Gee.HashMap<string, int> list_codecs (ListFilter ? list_filter = null) {
+    public async Gee.HashMap<string, int> list_codecs (ListFilter ? list_filter = null) throws Gtk4Radio.Error {
         return new Gee.HashMap<string, int> ();
     }
 
@@ -62,7 +62,7 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of codecs and station count for each.
      */
-    public async Gee.HashMap<string, int> list_states (ListFilter ? list_filter = null) {
+    public async Gee.HashMap<string, int> list_states (ListFilter ? list_filter = null) throws Gtk4Radio.Error {
         return new Gee.HashMap<string, int> ();
     }
 
@@ -72,7 +72,7 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of languages and station count for each.
      */
-    public async Gee.HashMap<string, int> list_languages (ListFilter ? list_filter = null) {
+    public async Gee.HashMap<string, int> list_languages (ListFilter ? list_filter = null) throws Gtk4Radio.Error {
         return new Gee.HashMap<string, int> ();
     }
 
@@ -82,7 +82,7 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of tags and station count for each.
      */
-    public async Gee.HashMap<string, int> list_tags (ListFilter ? list_filter = null) {
+    public async Gee.HashMap<string, int> list_tags (ListFilter ? list_filter = null) throws Gtk4Radio.Error {
         return new Gee.HashMap<string, int> ();
     }
 
@@ -91,17 +91,24 @@ public class Gtk4Radio.NetworkController {
      * The variants with "exact" will only search for perfect matches,
      * and others will search for the station whose attribute contains the search term.
      *
+     * @param search_by either byuuid, byname, bycountry ...etc.
      * @param query_filter Instance of {@link StationQueryFilter}, if null will return all stations.
      * @return list of stations.
      */
-    public async Gee.ArrayList<Station> list_stations (SearchBy ? search_by = null, StationQueryFilter ? query_filter = null) {
+    public async Gee.ArrayList<Station> list_stations_by (SearchBy ? search_by = null, StationQueryFilter ? query_filter = null) throws Gtk4Radio.Error {
         var result = new Gee.ArrayList<Station> ();
 
-        var search = api_url + "/json/stations/" + Gtk4Radio.SearchBy.COUNTRYCODE_EXACT.to_string() + "/EG";
+        var search = api_url + "/json/stations/" + Gtk4Radio.SearchBy.COUNTRYCODE_EXACT.to_string () + "/EG";
         print (search + "\n");
         var msg = new Soup.Message ("POST", search);
+        var param = new Soup.MessageHeaders (Soup.MessageHeadersType.MULTIPART);
+        // var form = Soup.Form.encode_datalist ();
+
+        param.set_encoding (Soup.Encoding.CONTENT_LENGTH);
+        param.append ("", "");
         try {
             var input_stream = yield session.send_async (msg, Priority.DEFAULT);
+
             var data_stream = new GLib.DataInputStream (input_stream);
             var string_builder = new StringBuilder ();
             string line = null;
@@ -110,17 +117,16 @@ public class Gtk4Radio.NetworkController {
                 string_builder.append (line);
                 string_builder.append_c ('\n');
             }
-            
+
             var parser = new Json.Parser ();
             parser.load_from_data (string_builder.str);
             var root = parser.get_root ();
             var arr = root.get_array ();
-            arr.foreach_element ((array, index, element_node) => { 
+            arr.foreach_element ((array, index, element_node) => {
                 var station = (Station) Json.gobject_deserialize (typeof (Station), element_node);
                 assert_nonnull (station);
                 result.add (station);
             });
-
         } catch (GLib.Error err) {
             critical ("Couldn't send request: %s\n", err.message);
         }
@@ -133,7 +139,26 @@ public class Gtk4Radio.NetworkController {
      * @param search_filter Instance of {@link StationQueryFilter}, if null will return all stations.
      * @return {@link GLib.InputStream} of Stations.
      */
-    public async GLib.InputStream list_stations_stream (SearchBy ? search_by = null, StationQueryFilter ? query_filter = null) {
+    public async GLib.InputStream list_stations_by_stream (SearchBy ? search_by = null, StationQueryFilter ? query_filter = null) throws Gtk4Radio.Error {
+        return new GLib.DataInputStream (null);
+    }
+
+    /**
+     * List all **Stations**.
+     *
+     * @return list of stations in Gee.ArrayList.
+     */
+    public async Gee.ArrayList<Station> list_all_stations () {
+        var result = new Gee.ArrayList<Station> ();
+        return result;
+    }
+
+    /**
+     * List all **Stations**.
+     *
+     * @return list of stations in Gee.ArrayList.
+     */
+    public async GLib.InputStream list_all_stations_stream () {
         return new GLib.DataInputStream (null);
     }
 
@@ -144,7 +169,7 @@ public class Gtk4Radio.NetworkController {
      * @param number of wanted stations.
      * @return list of stations by clicks.
      */
-    public async Gee.ArrayList<Station> list_stations_by_clicks (uint num_stations) {
+    public async Gee.ArrayList<Station> list_stations_by_clicks (uint num_stations) throws Gtk4Radio.Error {
         return new Gee.ArrayList<Station> ();
     }
 
@@ -154,7 +179,7 @@ public class Gtk4Radio.NetworkController {
      * @param number of wanted stations.
      * @return list of stations by votes.
      */
-    public async Gee.ArrayList<Station> list_stations_by_votes (uint num_stations) {
+    public async Gee.ArrayList<Station> list_stations_by_votes (uint num_stations) throws Gtk4Radio.Error {
         return new Gee.ArrayList<Station> ();
     }
 
@@ -164,7 +189,7 @@ public class Gtk4Radio.NetworkController {
      * @param number of wanted stations.
      * @return list of stations last checked.
      */
-    public async Gee.ArrayList<Station> list_stations_by_recent_click (uint num_stations) {
+    public async Gee.ArrayList<Station> list_stations_by_recent_click (uint num_stations) throws Gtk4Radio.Error {
         return new Gee.ArrayList<Station> ();
     }
 
@@ -174,7 +199,7 @@ public class Gtk4Radio.NetworkController {
      * @param number of wanted stations.
      * @return list of stations recently changed.
      */
-    public async Gee.ArrayList<Station> list_stations_by_recent_change (uint num_stations) {
+    public async Gee.ArrayList<Station> list_stations_by_recent_change (uint num_stations) throws Gtk4Radio.Error {
         return new Gee.ArrayList<Station> ();
     }
 
@@ -186,7 +211,7 @@ public class Gtk4Radio.NetworkController {
      * @param number of wanted stations.
      * @return list of stations in need for improvement.
      */
-    public async Gee.ArrayList<Station> list_improvable_stations (uint num_stations) {
+    public async Gee.ArrayList<Station> list_improvable_stations (uint num_stations) throws Gtk4Radio.Error {
         return new Gee.ArrayList<Station> ();
     }
 
@@ -196,7 +221,7 @@ public class Gtk4Radio.NetworkController {
      * @param number of wanted stations.
      * @return list of brocken stations.
      */
-    public async Gee.ArrayList<Station> list_brocken_stations (uint num_stations) {
+    public async Gee.ArrayList<Station> list_brocken_stations (uint num_stations) throws Gtk4Radio.Error {
         return new Gee.ArrayList<Station> ();
     }
 
@@ -208,7 +233,7 @@ public class Gtk4Radio.NetworkController {
      * @param station_uuid to vote for.
      * @return Json with "ok" : true if successfull, otherwise false
      */
-    public string vote_for_station (string station_uuid) {
+    public string vote_for_station (string station_uuid) throws Gtk4Radio.Error {
         return "";
     }
 
@@ -220,11 +245,11 @@ public class Gtk4Radio.NetworkController {
      * @param new_station to be added, name and url are mandatory.
      * @return Json with status of the transaction, including uuid of the new station.
      */
-    public string add_station (Station new_station) {
+    public string add_station (Station new_station) throws Gtk4Radio.Error {
         return "";
     }
 
     // Private methods
-    async void send_message_request_async (string resource) {
+    async void send_message_request_async (string resource) throws Gtk4Radio.Error {
     }
 }
