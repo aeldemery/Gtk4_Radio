@@ -2,9 +2,10 @@ subdir ('library')
 
 sources = files (
     'Main.vala',
-    'MainWindow.vala',
     'Application.vala',
     'Constants.vala',
+
+    'Views/MainWindow.vala',
 )
 
 dependencies = [
