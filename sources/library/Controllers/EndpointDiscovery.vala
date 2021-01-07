@@ -108,7 +108,7 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
             var str = (string) bytes.get_data ();
 
             try {
-                Json.Node ? root = Json.from_string (str);
+                Json.Node root = (!) Json.from_string (str);
 
                 var result = (ServerStats) Json.gobject_deserialize (typeof (Gtk4Radio.ServerStats), root);
                 return result;
