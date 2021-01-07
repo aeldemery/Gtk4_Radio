@@ -30,7 +30,7 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
      * @return ArrayList of all available servers, there is no garantee that all are working.
      * @throw NetworkError
      */
-    public Gee.ArrayList<string> get_api_urls (string domain, string service, NetworkProtocol protocol = NetworkProtocol.TCP,  bool add_https_prefix = true) throws Gtk4Radio.Error {
+    public Gee.ArrayList<string> get_api_urls (string domain, string service, NetworkProtocol protocol = NetworkProtocol.TCP, bool add_https_prefix = true) throws Gtk4Radio.Error {
         var result = new Gee.ArrayList<string> ();
         var resolver = GLib.Resolver.get_default ();
 
@@ -40,7 +40,7 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
         }
 
         try {
-            GLib.List<GLib.SrvTarget> records = resolver.lookup_service (service, protocol.to_string(), domain);
+            GLib.List<GLib.SrvTarget> records = resolver.lookup_service (service, protocol.to_string (), domain);
 
             foreach (GLib.SrvTarget record in records) {
                 result.add (prefix + record.get_hostname ());
@@ -125,9 +125,9 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
 }
 
 /**
-* Common Network Protocols
+ * Common Network Protocols
  */
- public enum Gtk4Radio.NetworkProtocol {
+public enum Gtk4Radio.NetworkProtocol {
     /** Transmission Control Protocol (TCP) */
     TCP,
     /** Internet Protocol (IP)  */
@@ -197,4 +197,4 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
             default: return "";
         }
     }
- }
+}
