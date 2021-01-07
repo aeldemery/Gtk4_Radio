@@ -31,6 +31,7 @@ public class Gtk4Radio.ServerStats : Object {
 
         builder.append_printf ("Clicks last day: %d\n", clicks_last_day);
         builder.append_printf ("Clicks last hour: %d\n", clicks_last_hour);
+
         return builder.str;
     }
 }
