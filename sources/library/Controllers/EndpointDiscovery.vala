@@ -45,9 +45,8 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
             foreach (GLib.SrvTarget record in records) {
                 result.add (prefix + record.get_hostname ());
             }
-        } catch (GLib.Error error) {
-            critical ("Unknown Host Name: %s", error.message);
-            throw new Error.NetworkError ("Could'n retrieve list of servers");
+        } catch (GLib.Error err) {
+            throw new Error.NetworkError ("EndpointDiscover:get_api_urls:Could'n retrieve list of servers: %s\n", err.message);
         }
         return result;
     }
@@ -84,8 +83,7 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
                     continue;
                 }
             } catch (Error.NetworkError err) {
-                critical ("Couldn't retrieve server stats: %s", err.message);
-                throw new Error.NetworkError ("Couldn't retrieve server stats");
+                throw new Error.NetworkError ("EndpointDiscovery:get_fastest_api_url:Couldn't retrieve server stats: %s\n", err.message);
             }
         }
         if (add_https_prefix && !fastest_url.has_prefix ("https://")) {
@@ -118,12 +116,10 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
                 var result = (ServerStats) Json.gobject_deserialize (typeof (Gtk4Radio.ServerStats), root);
                 return result;
             } catch (GLib.Error err) {
-                critical ("Failed to parse Json object to ServerStats: %s", err.message);
-                throw new Error.ParsingError ("Couldn't parse Json response to ServerStats");
+                throw new Error.ParsingError ("EndpointDiscovery:get_server_stats:Couldn't parse Json response to ServerStats: %s\n", err.message);
             }
         } catch (GLib.Error err) {
-            critical ("Unknown Host :s%", err.message);
-            throw new Error.NetworkError ("Couldn't retrieve server stats");
+            throw new Error.NetworkError ("EndpointDiscovery:get_server_stats:Couldn't retrieve server stats: %s\n", err.message);
         }
     }
 }
