@@ -17,19 +17,25 @@ int main (string[] args) {
         // print (server_stats.to_string ());
 
         var url = endpoint.get_fastest_api_url (urls);
-        print (url);
+        // print (url);
 
-        // var controller = new Gtk4Radio.NetworkController (url, Gtk4Radio.USER_AGENT);
+        var controller = new Gtk4Radio.NetworkController (url, Gtk4Radio.USER_AGENT);
 
-        // var loop = new MainLoop ();
-        // controller.list_stations.begin (null, null, (obj, res) => {
-        // var data = controller.list_stations.end (res);
-        // foreach (var station in data) {
-        // print (station.to_string ());
-        // }
-        // loop.quit ();
-        // } );
-        // loop.run ();
+        var loop = new MainLoop ();
+        var stations = new Gee.ArrayList<Gtk4Radio.Station> ();
+        controller.list_all_stations.begin ((obj, res) => {
+            try {
+                stations = controller.list_all_stations.end (res);
+                print ("Got %d Stations\n", stations.size);
+            } catch (Gtk4Radio.Error err) {
+                critical (err.message);
+            }
+            //  foreach (var station in stations) {
+            //      print (station.to_string ());
+            //  }
+            loop.quit ();
+        });
+        loop.run ();
 
 
         // var session = new Soup.Session ();
