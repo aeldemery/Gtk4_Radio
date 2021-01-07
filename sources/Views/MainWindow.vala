@@ -6,5 +6,15 @@
 public class Gtk4Radio.MainWindow : Gtk.ApplicationWindow {
     public MainWindow (Gtk.Application app) {
         Object (application: app);
+
+        this.default_height = 600;
+        this.default_width = 800;
+
+        var station_model = new StationsListModel ();
+        var station_view = new StationColumnView (station_model);
+
+        station_view.hexpand = station_view.vexpand = true;
+
+        this.set_child (station_view);
     }
 }
