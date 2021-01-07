@@ -8,8 +8,6 @@
  * for example `list_countries`, `list_codecs`, `list_states` ...
  */
 public class Gtk4Radio.ListFilter : Object {
-    /** Search term or optionally country name. */
-    public string filter_term { get; set; default = ""; }
     /** name of the attribute the result list will be sorted by, default is NAME. */
     public FilterOrder order { get; set; default = FilterOrder.NAME; }
 
@@ -17,7 +15,21 @@ public class Gtk4Radio.ListFilter : Object {
     public bool reverse { get; set; default = false; }
 
     /** do not count broken stations, default is true */
-    public bool hide_brocken { get; set; default = true; }
+    public bool hide_brocken { get; set; default = false; }
+
+    /**
+     * Build a string containing pairs of "key=value",
+     * if multiple have been changed from the default, then append "&" as a separator
+     */
+    public string build_request_string () {
+        var builder = new StringBuilder ("?");
+
+        if (order != FilterOrder.NAME) builder.append_printf ("order=%s&", order.to_string ());
+        if (reverse == true) builder.append ("reverse=true&");
+        if (hide_brocken == true) builder.append ("hidebrocken=true&");
+
+        return builder.str;
+    }
 }
 
 /**
@@ -26,5 +38,13 @@ public class Gtk4Radio.ListFilter : Object {
  */
 public enum Gtk4Radio.FilterOrder {
     NAME,
-    STATION_COUNT,
+    STATION_COUNT;
+
+    public string to_string () {
+        switch (this) {
+            case NAME: return "name";
+            case STATION_COUNT: return "stationcount";
+            default: return "";
+        }
+    }
 }
