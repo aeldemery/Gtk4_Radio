@@ -4,7 +4,7 @@
 
 - [About](#about)
 - [Getting Started](#getting_started)
-- [Usage](#usage)
+- [Screenshot](#screenshot)
 
 ## About <a name = "about"></a>
 
@@ -19,6 +19,6 @@ Be aware however that you shouldn't install `libsoup` to `/usr` directory as it 
 
 It doesn't do anything usefull __yet__. So probably you don't want to.
 
-## Usage <a name = "usage"></a>
+## Screenshot <a name = "usage"></a>
 
-Not yet applicable.
+![Screenshot](Screenshot1.png)
