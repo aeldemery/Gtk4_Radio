@@ -1,4 +1,4 @@
-subdir ('library')
+subdir ('Library')
 
 sources = files (
     'Main.vala',
