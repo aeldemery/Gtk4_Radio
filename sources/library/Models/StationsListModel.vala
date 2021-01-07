@@ -10,30 +10,31 @@
 public class Gtk4Radio.StationsListModel : GLib.Object, GLib.ListModel {
     Gee.ArrayList<Station> all_stations;
 
-    public StationsListModel () {
-        if (construct_all_stations () != true) {
-            warning ("all_stations is null");
-        }
-    }
-
-    bool construct_all_stations () {
+    construct {
         var endpoint = new EndpoinDiscovery (USER_AGENT);
         try {
             var urls = endpoint.get_api_urls ("radio-browser.info", "api");
             var controller = new NetworkController (urls[0], USER_AGENT);
+            
             var loop = new MainLoop ();
-            controller.list_all_stations.begin ( (obj, res) => {
+            controller.list_all_stations.begin ((obj, res) => {
                 try {
                     all_stations = controller.list_all_stations.end (res);
-                    loop.quit ();
                 } catch (Gtk4Radio.Error err) {
-                    warning ("Failed to construct all_stations: %s\n", err.message);
+                    warning ("Couldn't fetch stations: %s\n", err.message);
+                } finally {
+                    loop.quit ();
                 }
             });
-            return true;
+            loop.run ();
+            
         } catch (Gtk4Radio.Error err) {
             error ("Couldn't retrieve urls: %s\n", err.message);
         }
+    }
+
+    public StationsListModel () {
+       
     }
 
     public uint get_n_items () {
@@ -50,8 +51,13 @@ public class Gtk4Radio.StationsListModel : GLib.Object, GLib.ListModel {
 
     public GLib.Object ? get_item (uint position) {
         if (all_stations != null) {
-            var index = int.max ((int) position, all_stations.size);
-            return all_stations.get (index);
+            if (position > all_stations.size) {
+                warning ("Trying to index outside bounds\n");
+                var index = (int) uint.max (position, all_stations.size);
+                return all_stations[index];
+            } else {
+                return all_stations[(int) position];
+            }
         } else {
             return null;
         }
