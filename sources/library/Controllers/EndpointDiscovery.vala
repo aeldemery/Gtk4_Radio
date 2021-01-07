@@ -23,14 +23,14 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
     /**
      * Lookup the Endpoint service and return a list of available server names.
      *
+     * @param domain the base host name, for example "example.info".
      * @param service of url, for example "api" or "ldap".
      * @param protocol type of protocol, for example "tcp".
-     * @param domain the base host name, for example "example.info".
      * @param add_https_prefix add "https://" to the returned host name
      * @return ArrayList of all available servers, there is no garantee that all are working.
      * @throw NetworkError
      */
-    public Gee.ArrayList<string> get_api_urls (string service, string protocol, string domain, bool add_https_prefix = true) throws Gtk4Radio.Error {
+    public Gee.ArrayList<string> get_api_urls (string domain, string service, NetworkProtocol protocol = NetworkProtocol.TCP,  bool add_https_prefix = true) throws Gtk4Radio.Error {
         var result = new Gee.ArrayList<string> ();
         var resolver = GLib.Resolver.get_default ();
 
@@ -40,7 +40,7 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
         }
 
         try {
-            GLib.List<GLib.SrvTarget> records = resolver.lookup_service (service, protocol, domain);
+            GLib.List<GLib.SrvTarget> records = resolver.lookup_service (service, protocol.to_string(), domain);
 
             foreach (GLib.SrvTarget record in records) {
                 result.add (prefix + record.get_hostname ());
@@ -123,3 +123,78 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
         }
     }
 }
+
+/**
+* Common Network Protocols
+ */
+ public enum Gtk4Radio.NetworkProtocol {
+    /** Transmission Control Protocol (TCP) */
+    TCP,
+    /** Internet Protocol (IP)  */
+    IP,
+    /**  User Datagram Protocol (UDP)  */
+    UDP,
+    /**  Post office Protocol (POP)  */
+    POP,
+    /**  Simple mail transport Protocol (SMTP)  */
+    SMTP,
+    /**  File Transfer Protocol (FTP)  */
+    FTP,
+    /**  Hyper Text Transfer Protocol (HTTP)  */
+    HTTP,
+    /**  Hyper Text Transfer Protocol Secure (HTTPS)  */
+    HTTPS,
+    /**  Telnet  */
+    TELNET,
+    /**  Gopher  */
+    GOPHER,
+    /**  ARP (Address Resolution Protocol)  */
+    ARP,
+    /**  DHCP (Dynamic Host Configuration Protocol)  */
+    DHCP,
+    /**  IMAP4 (Internet Message Access Protocol)  */
+    IMAP4,
+    /**  SIP (Session Initiation Protocol)  */
+    SIP,
+    /**  RTP (Real-Time Transport Protocol)  */
+    RTP,
+    /**  RLP (Resource Location Protocol)  */
+    RLP,
+    /**  RAP (Route Access Protocol)  */
+    RAP,
+    /**  L2TP (Layer Two Tunnelling Protocol)  */
+    L2TP,
+    /**  PPTP (Point To Point Tunnelling Protocol)  */
+    PPTP,
+    /**  SNMP (Simple Network Management Protocol)  */
+    SNMP,
+    /**  TFTP (Trivial File Transfer Protocol)  */
+    TFTP;
+
+    public string to_string () {
+        switch (this) {
+            case TCP: return "tcp";
+            case IP: return "ip";
+            case UDP: return "udp";
+            case POP: return "pop";
+            case SMTP: return "smtp";
+            case FTP: return "ftp";
+            case HTTP: return "http";
+            case HTTPS: return "https";
+            case TELNET: return "telnet";
+            case GOPHER: return "gopher";
+            case ARP: return "arp";
+            case DHCP: return "dhcp";
+            case IMAP4: return "imap4";
+            case SIP: return "sip";
+            case RTP: return "rtp";
+            case RLP: return "rlp";
+            case RAP: return "rap";
+            case L2TP: return "l2tp";
+            case PPTP: return "pptp";
+            case SNMP: return "snmp";
+            case TFTP: return "tftp";
+            default: return "";
+        }
+    }
+ }
