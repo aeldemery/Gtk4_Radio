@@ -10,6 +10,16 @@ public class Gtk4Radio.NetworkController {
     string api_url;
 
     /**
+     * Signal started_parsing is emited whenever parsing of json response is started.
+     */
+    public signal void started_parsing ();
+
+    /**
+     * Signal finished_parsing is emited whenever parsing of json response is successfuly completed.
+     */
+    public signal void finished_parsing ();
+
+    /**
      * {@inheritDoc}
      * @param api_url Endpoint API url.
      * @param user_agent "App/Version"
