@@ -40,8 +40,24 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of countries and station count for each.
      */
-    public async Gee.HashMap<string, int> list_countries (ListFilter ? list_filter = null) throws Gtk4Radio.Error {
-        return new Gee.HashMap<string, int> ();
+    public async Gee.ArrayList<Country> list_countries (ListFilter list_filter) throws Gtk4Radio.Error {
+        var result = new Gee.ArrayList<Country> ();
+        string resource = "/json/countries";
+
+        resource += list_filter.build_request_string ();
+
+        Json.Node ? root = yield send_message_request_async (resource);
+
+        if (root != null) {
+            Json.Array ? arr = root.get_array ();
+            if (arr != null) {
+                arr.foreach_element ((array, index, element) => {
+                    var item = (Country) Json.gobject_deserialize (typeof(Country), element);
+                    result.add (item);
+                });
+            }
+        }
+        return result;
     }
 
     /**
@@ -50,8 +66,24 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of countries and station count for each.
      */
-    public async Gee.HashMap<string, int> list_countries_by_code (ListFilter ? list_filter = null) throws Gtk4Radio.Error {
-        return new Gee.HashMap<string, int> ();
+    public async Gee.ArrayList<CountryCode> list_countries_by_code (ListFilter list_filter) throws Gtk4Radio.Error {
+        var result = new Gee.ArrayList<CountryCode> ();
+        string resource = "/json/countrycodes";
+
+        resource += list_filter.build_request_string ();
+
+        Json.Node ? root = yield send_message_request_async (resource);
+
+        if (root != null) {
+            Json.Array ? arr = root.get_array ();
+            if (arr != null) {
+                arr.foreach_element ((array, index, element) => {
+                    var item = (CountryCode) Json.gobject_deserialize (typeof(CountryCode), element);
+                    result.add (item);
+                });
+            }
+        }
+        return result;
     }
 
     /**
@@ -60,8 +92,24 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of codecs and station count for each.
      */
-    public async Gee.HashMap<string, int> list_codecs (ListFilter ? list_filter = null) throws Gtk4Radio.Error {
-        return new Gee.HashMap<string, int> ();
+    public async Gee.ArrayList<Codec> list_codecs (ListFilter list_filter) throws Gtk4Radio.Error {
+        var result = new Gee.ArrayList<Codec> ();
+        string resource = "/json/codecs";
+
+        resource += list_filter.build_request_string ();
+
+        Json.Node ? root = yield send_message_request_async (resource);
+
+        if (root != null) {
+            Json.Array ? arr = root.get_array ();
+            if (arr != null) {
+                arr.foreach_element ((array, index, element) => {
+                    var item = (Codec) Json.gobject_deserialize (typeof(Codec), element);
+                    result.add (item);
+                });
+            }
+        }
+        return result;
     }
 
     /**
@@ -70,10 +118,29 @@ public class Gtk4Radio.NetworkController {
      * it will only return the ones containing the filter as substring.
      * If a country is given, it will only display states in this country
      *
+     * @param country the name of the country the state belongs to, please not that it's case senttive!
      * @return list of codecs and station count for each.
      */
-    public async Gee.HashMap<string, int> list_states (ListFilter ? list_filter = null) throws Gtk4Radio.Error {
-        return new Gee.HashMap<string, int> ();
+    public async Gee.ArrayList<State> list_states (string country = "", ListFilter list_filter) throws Gtk4Radio.Error {
+        var result = new Gee.ArrayList<State> ();
+        string resource = "/json/states";
+        if (country != "") {
+            resource += "/" + country + "/";
+        }
+        resource += list_filter.build_request_string ();
+
+        Json.Node ? root = yield send_message_request_async (resource);
+
+        if (root != null) {
+            Json.Array ? arr = root.get_array ();
+            if (arr != null) {
+                arr.foreach_element ((array, index, element) => {
+                    var item = (State) Json.gobject_deserialize (typeof(State), element);
+                    result.add (item);
+                });
+            }
+        }
+        return result;
     }
 
     /**
@@ -168,7 +235,7 @@ public class Gtk4Radio.NetworkController {
 
             if (check_response_status (msg) == true) {
                 try {
-                    this.started_parsing ();
+                    this.started_json_parsing ();
                     yield parser.load_from_stream_async (stream);
 
                     Json.Node ? root = parser.get_root ();
@@ -179,7 +246,7 @@ public class Gtk4Radio.NetworkController {
                                 var station = (Station) Json.gobject_deserialize (typeof (Station), element);
                                 result.add (station);
                             });
-                            this.finished_parsing ();
+                            this.finished_json_parsing ();
                         }
                     }
                 } catch (GLib.Error err) {
@@ -288,11 +355,14 @@ public class Gtk4Radio.NetworkController {
         return "";
     }
 
-    // Private methods
+    // Private methods, returns json root node
     async Json.Node ? send_message_request_async (string resource) throws Gtk4Radio.Error {
         var parser = new Json.Parser ();
-        var msg = new Soup.Message ("POST", api_url + resource);
+        string uri_string = api_url + resource;
 
+        print (uri_string + "\n");
+
+        var msg = new Soup.Message ("POST", uri_string);
         try {
             GLib.InputStream stream = yield session.send_async (msg, Priority.DEFAULT);
 
