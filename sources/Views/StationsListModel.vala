@@ -16,7 +16,7 @@ public class Gtk4Radio.StationsListModel : GLib.Object, GLib.ListModel {
             Gee.ArrayList<string> urls = endpoint.get_api_urls ("radio-browser.info", "api");
             string url = endpoint.get_fastest_api_url (urls);
             var controller = new NetworkController (url, USER_AGENT);
-            
+
             var loop = new MainLoop ();
             controller.list_all_stations.begin ((obj, res) => {
                 try {
@@ -28,14 +28,12 @@ public class Gtk4Radio.StationsListModel : GLib.Object, GLib.ListModel {
                 }
             });
             loop.run ();
-            
         } catch (Gtk4Radio.Error err) {
             error ("Couldn't retrieve urls: %s\n", err.message);
         }
     }
 
     public StationsListModel () {
-       
     }
 
     public uint get_n_items () {
