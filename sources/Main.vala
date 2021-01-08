@@ -4,78 +4,78 @@
 // https://opensource.org/licenses/MIT
 
 int main (string[] args) {
-    var app = new Gtk4Radio.RadioApplication ();
-    return app.run (args);
+    // var app = new Gtk4Radio.RadioApplication ();
+    // return app.run (args);
+
+    GLib.Intl.setlocale ();
+    try {
+        var endpoint = new Gtk4Radio.EndpoinDiscovery (Gtk4Radio.USER_AGENT);
+        var urls = endpoint.get_api_urls ("radio-browser.info", "api");
+        var controller = new Gtk4Radio.NetworkController (urls[0], Gtk4Radio.USER_AGENT);
+
+        var loop = new MainLoop ();
+
+        // Test all stations
+        /*
+        var stations = new Gee.ArrayList<Gtk4Radio.Station> ();
+        controller.list_all_stations.begin ((obj, res) => {
+            try {
+                stations = controller.list_all_stations.end (res);
+                print ("Got %d Stations\n", stations.size);
+            } catch (Gtk4Radio.Error err) {
+                critical (err.message);
+            }
+
+            loop.quit ();
+        });
+        loop.run ();
+        */
+
+        /*
+        var countries = new Gee.ArrayList<Gtk4Radio.Codec> ();
+
+        controller.list_codecs.begin (list_filter, (obj, res) => {
+            try {
+                countries = controller.list_codecs.end (res);
+                print ("Got %d items\n", countries.size);
+            } catch (Gtk4Radio.Error err) {
+                critical (err.message);
+            }
+            loop.quit ();
+        });
+        loop.run ();
+
+        foreach (var country in countries) {
+            print (country.to_string() + "\n");
+        }
+        */
+
+        var list_filter = new Gtk4Radio.ListFilter ();
+        print (list_filter.build_request_string () + "\n");
+        list_filter.order = Gtk4Radio.FilterOrder.STATION_COUNT;
+        list_filter.search_term = "bad";
+        // list_filter.reverse = true;
+        print (list_filter.build_request_string () + "\n");
+        
+        var states = new Gee.ArrayList<Gtk4Radio.State> ();
+        controller.list_states.begin("Germany", list_filter, (obj, res) => {
+            try {
+                states = controller.list_states.end (res);
+                print ("Got %d items\n", states.size);
+            } catch (Gtk4Radio.Error err) {
+                critical (err.message);
+            }
+            loop.quit ();
+        });
+        loop.run ();
+
+        /*  foreach (var state in states) {
+            //print (state.to_string() + "\n");
+        }  */
+
+    } catch (Gtk4Radio.Error err) {
+        critical (err.message);
+    }
+
+    return 0;
 }
-
-// GLib.Intl.setlocale ();
-// try {
-// var endpoint = new Gtk4Radio.EndpoinDiscovery (Gtk4Radio.USER_AGENT);
-// var urls = endpoint.get_api_urls ("radio-browser.info", "api");
-
-//// var search_by = Gtk4Radio.SearchBy.NAME;
-//// print (search_by.to_string ());
-//// var stats_url = urls[0] + "/json/stats";
-
-//// var server_stats = endpoint.get_server_stats (stats_url);
-//// print (server_stats.to_string ());
-
-// var url = endpoint.get_fastest_api_url (urls);
-//// print (url);
-
-// var controller = new Gtk4Radio.NetworkController (url, Gtk4Radio.USER_AGENT);
-
-// var loop = new MainLoop ();
-// var stations = new Gee.ArrayList<Gtk4Radio.Station> ();
-// controller.list_all_stations.begin ((obj, res) => {
-// try {
-// stations = controller.list_all_stations.end (res);
-// print ("Got %d Stations\n", stations.size);
-// } catch (Gtk4Radio.Error err) {
-// critical (err.message);
-// }
-//// foreach (var station in stations) {
-//// print (station.to_string ());
-//// }
-// loop.quit ();
-// });
-// loop.run ();
-
-
-//// var session = new Soup.Session ();
-//// var message = new Soup.Message ("GET", ip_addresses[0]);
-//// var input_stream = session.send (message);
-//// var data_input_stream = new GLib.DataInputStream (input_stream);
-//// var str = data_input_stream.read_line_utf8 ();
-//// print ("s%\n", str);
-// } catch (Gtk4Radio.Error err) {
-// print (err.message);
-// }
-
-//// return 0;
-
-//// var loop = new MainLoop ();
-//// var session = new Soup.Session ();
-//// GLib.Bytes bytes = new GLib.Bytes (null);
-//// get_uri_contents.begin (session, str_records[0], (obj, res) => {
-//// bytes = get_uri_contents.end (res);
-//// loop.quit ();
-//// });
-//// loop.run ();
-//// if (bytes != null) {
-//// print ((string) bytes.get_data ());
-//// }
-// return 0;
-// }
-// async GLib.Bytes ? get_uri_contents (Soup.Session session, string address) {
-// var content_type = "";
-// try {
-// var api_address = "https://" + address + "/json/stations";
-// var bytes = yield session.load_uri_bytes_async (api_address, Priority.DEFAULT, null, out content_type);
-
-// return bytes;
-// } catch (Error err) {
-// warning ("Error: %s\n", err.message);
-// return null;
-// }
-// }
