@@ -10,14 +10,14 @@ public class Gtk4Radio.NetworkController {
     string api_url;
 
     /**
-     * Signal started_parsing is emited whenever parsing of json response is started.
+     * Signal started_json_parsing is emited whenever parsing of json response is started.
      */
-    public signal void started_parsing ();
+    public signal void started_json_parsing ();
 
     /**
-     * Signal finished_parsing is emited whenever parsing of json response is successfuly completed.
+     * Signal finished_json_parsing is emited whenever parsing of json response is successfuly completed.
      */
-    public signal void finished_parsing ();
+    public signal void finished_json_parsing ();
 
     /**
      * {@inheritDoc}
@@ -289,7 +289,30 @@ public class Gtk4Radio.NetworkController {
     }
 
     // Private methods
-    async void send_message_request_async (string resource) throws Gtk4Radio.Error {
+    async Json.Node ? send_message_request_async (string resource) throws Gtk4Radio.Error {
+        var parser = new Json.Parser ();
+        var msg = new Soup.Message ("POST", api_url + resource);
+
+        try {
+            GLib.InputStream stream = yield session.send_async (msg, Priority.DEFAULT);
+
+            if (check_response_status (msg) == true) {
+                try {
+                    this.started_json_parsing ();
+                    yield parser.load_from_stream_async (stream);
+
+                    Json.Node ? root = parser.get_root ();
+                    this.finished_json_parsing ();
+                    return root;
+                } catch (GLib.Error err) {
+                    throw new Error.ParsingError ("NetworkController:list_all_stations:Couldn't parse Json: %s\n", err.message);
+                }
+            } else {
+                return null;
+            }
+        } catch (GLib.Error err) {
+            throw new Error.NetworkError ("NetworkController:list_all_stations:Couldn't get stations: %s\n", err.message);
+        }
     }
 
     bool check_response_status (Soup.Message msg) {
