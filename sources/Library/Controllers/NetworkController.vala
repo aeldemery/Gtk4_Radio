@@ -41,7 +41,7 @@ public class Gtk4Radio.NetworkController {
      * @return list of countries and station count for each.
      */
     public async Gee.ArrayList<Country> list_countries (ListFilter list_filter) throws Gtk4Radio.Error {
-        string resource = "/json/countries/";
+        string resource = @"/json/countries/$(list_filter.search_term)";
         resource += list_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
@@ -56,7 +56,7 @@ public class Gtk4Radio.NetworkController {
      * @return list of countries and station count for each.
      */
     public async Gee.ArrayList<CountryCode> list_countries_by_code (ListFilter list_filter) throws Gtk4Radio.Error {
-        string resource = "/json/countrycodes/";
+        string resource = @"/json/countrycodes/$(list_filter.search_term)";
         resource += list_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
@@ -71,7 +71,7 @@ public class Gtk4Radio.NetworkController {
      * @return list of codecs and station count for each.
      */
     public async Gee.ArrayList<Codec> list_codecs (ListFilter list_filter) throws Gtk4Radio.Error {
-        string resource = "/json/codecs/";
+        string resource = @"/json/codecs/$(list_filter.search_term)";
         resource += list_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
@@ -93,6 +93,7 @@ public class Gtk4Radio.NetworkController {
         if (country != "") {
             resource += country + "/";
         }
+        resource += list_filter.search_term;
         resource += list_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
@@ -107,7 +108,7 @@ public class Gtk4Radio.NetworkController {
      * @return list of languages and station count for each.
      */
     public async Gee.ArrayList<Language> list_languages (ListFilter list_filter) throws Gtk4Radio.Error {
-        string resource = "/json/languages/";
+        string resource = @"/json/languages/$(list_filter.search_term)";
         resource += list_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
@@ -122,7 +123,7 @@ public class Gtk4Radio.NetworkController {
      * @return list of tags and station count for each.
      */
     public async Gee.ArrayList<Tag> list_tags (ListFilter list_filter) throws Gtk4Radio.Error {
-        string resource = "/json/tags/";
+        string resource = @"/json/tags/$(list_filter.search_term)";
         resource += list_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
@@ -154,8 +155,26 @@ public class Gtk4Radio.NetworkController {
      * @param search_filter Instance of {@link StationQueryFilter}, if null will return all stations.
      * @return {@link GLib.InputStream} of Stations.
      */
-    public async GLib.InputStream list_stations_by_stream (SearchBy ? search_by = null, StationQueryFilter ? query_filter = null) throws Gtk4Radio.Error {
-        return new GLib.DataInputStream (null);
+    public async GLib.InputStream? list_stations_by_stream (SearchBy search_by, StationQueryFilter query_filter) throws Gtk4Radio.Error {
+        string resource = @"/json/stations/$search_by/";
+        resource += query_filter.build_request_params ();
+        string uri_string = api_url + resource;
+
+        GLib.InputStream stream = null;
+
+        print (uri_string + "\n");
+
+        var msg = new Soup.Message ("POST", uri_string);
+        try {
+            stream = yield session.send_async (msg, Priority.DEFAULT);
+
+            if (check_response_status (msg) == true) {
+                return stream;
+            }
+        } catch (GLib.Error err) {
+            throw new Error.NetworkError ("NetworkController:list_all_stations:Couldn't get stations: %s\n", err.message);
+        }
+        return stream;
     }
 
     /**
@@ -176,8 +195,25 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of stations in Gee.ArrayList.
      */
-    public async GLib.InputStream list_all_stations_stream () {
-        return new GLib.DataInputStream (null);
+    public async GLib.InputStream? list_all_stations_stream () throws Gtk4Radio.Error {
+        string resource = @"/json/stations/";
+        string uri_string = api_url + resource;
+
+        GLib.InputStream stream = null;
+
+        print (uri_string + "\n");
+
+        var msg = new Soup.Message ("POST", uri_string);
+        try {
+            stream = yield session.send_async (msg, Priority.DEFAULT);
+
+            if (check_response_status (msg) == true) {
+                return stream;
+            }
+        } catch (GLib.Error err) {
+            throw new Error.NetworkError ("NetworkController:list_all_stations:Couldn't get stations: %s\n", err.message);
+        }
+        return stream;
     }
 
     /**
@@ -273,10 +309,25 @@ public class Gtk4Radio.NetworkController {
      * If it works, the changed station will be returned as result.
      *
      * @param station_uuid to vote for.
-     * @return Json with "ok" : true if successfull, otherwise false
+     * @return true if successfull, otherwise false
      */
-    public string vote_for_station (string station_uuid) throws Gtk4Radio.Error {
-        return "";
+    public async bool vote_for_station (string station_uuid) throws Gtk4Radio.Error {
+        string resource = @"/json/vote/$station_uuid";
+
+        Json.Node ? root = yield send_message_request_async (resource);
+        Json.Object ? obj = root.get_object ();
+        if (obj != null) {
+            string ok = obj.get_string_member ("ok");
+            string str_message = obj.get_string_member ("message");
+
+            if (ok == "true") {
+                message (@"Voted Successfully: $str_message");
+                return true;
+            } else if (ok == "false") {
+                message (@"Vote Error: $str_message");
+            }
+        }
+        return false;
     }
 
     /**
@@ -287,8 +338,39 @@ public class Gtk4Radio.NetworkController {
      * @param new_station to be added, name and url are mandatory.
      * @return Json with status of the transaction, including uuid of the new station.
      */
-    public string add_station (Station new_station) throws Gtk4Radio.Error {
-        return "";
+    public async bool add_station (Station new_station) throws Gtk4Radio.Error {
+        var builder = new StringBuilder ();
+
+        if (new_station.name == "" || new_station.url == "") {
+            throw new Gtk4Radio.Error.BadRequest ("Name and Url of the new station are mandatory");
+        }
+
+        builder.append_printf ("?name=%s&", new_station.name);
+        builder.append_printf ("url=%s&", new_station.url);
+        builder.append_printf ("homepage=%s&", new_station.homepage);
+        builder.append_printf ("favicon=%s&", new_station.favicon);
+        builder.append_printf ("countrycode=%s&", new_station.countrycode);
+        builder.append_printf ("state=%s&", new_station.state);
+        builder.append_printf ("language=%s&", new_station.language);
+        builder.append_printf ("tags=%s", new_station.tags);
+
+        string resource = @"/json/add$(builder.str)";
+
+        Json.Node ? root = yield send_message_request_async (resource);
+        Json.Object ? obj = root.get_object ();
+        if (obj != null) {
+            string ok = obj.get_string_member ("ok");
+            string str_message = obj.get_string_member ("message");
+            string station_id = obj.get_string_member ("uuid");
+
+            if (ok == "true") {
+                message (@"Added Station Successfully: $str_message\nNew Station ID: $station_id");
+                return true;
+            } else if (ok == "false") {
+                message (@"Vote Error: $str_message");
+            }
+        }
+        return false;
     }
 
     // Private methods, returns json root node
