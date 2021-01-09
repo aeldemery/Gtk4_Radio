@@ -12,4 +12,5 @@ public errordomain Gtk4Radio.Error {
     NetworkError,
     FileError,
     DatabaseError,
+    BadRequest,
 }
