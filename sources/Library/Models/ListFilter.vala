@@ -8,6 +8,32 @@
  * for example `list_countries`, `list_codecs`, `list_states` ...
  */
 public class Gtk4Radio.ListFilter : Object {
+    StringBuilder builder;
+
+    /**
+     * {@inheritDoc}
+     */
+    public ListFilter () {
+        builder = new StringBuilder ();
+
+        this.notify.connect ((obj, prop) => {
+            if (prop.value_type == typeof (string)) {
+                // string value;
+                // obj.get (prop.name, out value);
+                // builder.append_printf ("_%s=%s_", prop.name, value);
+            } else if (prop.value_type == typeof (bool)) {
+                bool value;
+                obj.get (prop.name, out value);
+                builder.append_printf ("_%s=%s_", prop.name, value.to_string ());
+            } else if (prop.value_type == typeof (FilterOrder)) {
+                FilterOrder value;
+                obj.get (prop.name, out value);
+                builder.append_printf ("_%s=%s_", prop.name, value.to_string ());
+            } else {
+                assert_not_reached ();
+            }
+        });
+    }
     /** name of the attribute the result list will be sorted by, default is NAME. */
     public FilterOrder order { get; set; default = FilterOrder.NAME; }
 
@@ -25,9 +51,19 @@ public class Gtk4Radio.ListFilter : Object {
      * if multiple have been changed from the default, then append "&" as a separator
      */
     public string build_request_params () {
-        var builder = new StringBuilder ();
+        // replace _ _ placeholder with &
+        for (var i = 0; i < builder.len; i++) {
+            if ((builder.str[i] == '_') && (builder.str[i + 1] == '_')) {
+                builder.str = builder.str.splice (i, i + 2, "&");
+            }
+        }
+        // remove leading/trailing _ and / and any wierd symbols
+        builder.str = builder.str.replace ("_", "");
 
-        if (search_term != "") {
+        if (builder.str != "") builder.prepend_c ('?');
+
+        /*
+           if (search_term != "") {
             search_term = search_term.replace ("/", "");
 
             for (var i = 0; i < search_term.length; i++) {
@@ -35,12 +71,8 @@ public class Gtk4Radio.ListFilter : Object {
                     builder.append_unichar (search_term.get_char (i));
                 }
             }
-        }
-
-        builder.append_printf ("?order=%s&", order.to_string ());
-        builder.append_printf ("reverse=%s&", reverse ? "true" : "false");
-        builder.append_printf ("hidebrocken=%s", hide_brocken ? "true" : "false");
-
+           }
+         */
         return builder.str;
     }
 }
