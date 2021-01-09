@@ -141,7 +141,7 @@ public class Gtk4Radio.NetworkController {
      */
     public async Gee.ArrayList<Station> list_stations_by (SearchBy search_by, StationQueryFilter query_filter) throws Gtk4Radio.Error {
         string resource = @"/json/stations/$search_by/";
-        resource += query_filter.build_request_string ();
+        resource += query_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
 
