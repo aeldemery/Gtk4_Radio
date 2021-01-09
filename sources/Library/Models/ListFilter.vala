@@ -26,20 +26,20 @@ public class Gtk4Radio.ListFilter : Object {
      */
     public string build_request_string () {
         var builder = new StringBuilder ();
-        
+
         if (search_term != "") {
             search_term = search_term.replace ("/", "");
 
             for (var i = 0; i < search_term.length; i++) {
-                if (search_term.get_char (i).isalnum()) {
-                    builder.append_unichar (search_term.get_char(i));
+                if (search_term.get_char (i).isalnum ()) {
+                    builder.append_unichar (search_term.get_char (i));
                 }
             }
         }
 
         builder.append_printf ("?order=%s&", order.to_string ());
-        builder.append_printf ("reverse=%s&", reverse? "true" : "false");
-        builder.append_printf ("hidebrocken=%s", hide_brocken? "true" : "false");
+        builder.append_printf ("reverse=%s&", reverse ? "true" : "false");
+        builder.append_printf ("hidebrocken=%s", hide_brocken ? "true" : "false");
 
         return builder.str;
     }
