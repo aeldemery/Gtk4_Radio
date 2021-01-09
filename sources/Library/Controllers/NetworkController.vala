@@ -42,7 +42,7 @@ public class Gtk4Radio.NetworkController {
      */
     public async Gee.ArrayList<Country> list_countries (ListFilter list_filter) throws Gtk4Radio.Error {
         string resource = "/json/countries/";
-        resource += list_filter.build_request_string ();
+        resource += list_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
 
@@ -57,7 +57,7 @@ public class Gtk4Radio.NetworkController {
      */
     public async Gee.ArrayList<CountryCode> list_countries_by_code (ListFilter list_filter) throws Gtk4Radio.Error {
         string resource = "/json/countrycodes/";
-        resource += list_filter.build_request_string ();
+        resource += list_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
 
@@ -72,7 +72,7 @@ public class Gtk4Radio.NetworkController {
      */
     public async Gee.ArrayList<Codec> list_codecs (ListFilter list_filter) throws Gtk4Radio.Error {
         string resource = "/json/codecs/";
-        resource += list_filter.build_request_string ();
+        resource += list_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
 
@@ -93,7 +93,7 @@ public class Gtk4Radio.NetworkController {
         if (country != "") {
             resource += country + "/";
         }
-        resource += list_filter.build_request_string ();
+        resource += list_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
 
@@ -108,7 +108,7 @@ public class Gtk4Radio.NetworkController {
      */
     public async Gee.ArrayList<Language> list_languages (ListFilter list_filter) throws Gtk4Radio.Error {
         string resource = "/json/languages/";
-        resource += list_filter.build_request_string ();
+        resource += list_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
 
@@ -123,7 +123,7 @@ public class Gtk4Radio.NetworkController {
      */
     public async Gee.ArrayList<Tag> list_tags (ListFilter list_filter) throws Gtk4Radio.Error {
         string resource = "/json/tags/";
-        resource += list_filter.build_request_string ();
+        resource += list_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
 

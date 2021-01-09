@@ -24,7 +24,7 @@ public class Gtk4Radio.ListFilter : Object {
      * Build a string containing pairs of "key=value",
      * if multiple have been changed from the default, then append "&" as a separator
      */
-    public string build_request_string () {
+    public string build_request_params () {
         var builder = new StringBuilder ();
 
         if (search_term != "") {
