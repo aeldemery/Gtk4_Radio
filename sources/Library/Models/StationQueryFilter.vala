@@ -123,7 +123,7 @@ public class Gtk4Radio.StationQueryFilter : Object {
         }
         // remove leading/trailing _
         builder.str = builder.str.replace ("_", "");
-        if (builder.str != "") builder.prepend_c ('?');
+        if (builder.str != "" && (builder.str.get_char (0) != '?')) builder.prepend_c ('?');
         return builder.str;
     }
 }
@@ -201,5 +201,73 @@ public enum Gtk4Radio.SearchBy {
             case TAG_EXACT: return "bytagexact";
             default: return "";
         }
+    }
+}
+
+/**
+ * Filter to pass for station search by name/uuid/country ...etc.
+ * This is different from {@link Gtk4Radio.StationQueryFilter} because it contains limited parameters.
+ */
+public class Gtk4Radio.StationListFilter : Object {
+    StringBuilder builder;
+
+    public StationListFilter () {
+        builder = new StringBuilder ();
+        this.notify.connect ((obj, prop) => {
+            if (prop.value_type == typeof (string)) {
+                string value;
+                obj.get (prop.name, out value);
+                builder.append_printf ("_%s=%s_", prop.name, value);
+            } else if (prop.value_type == typeof (bool)) {
+                bool value;
+                obj.get (prop.name, out value);
+                builder.append_printf ("_%s=%s_", prop.name, value.to_string ());
+            } else if (prop.value_type == typeof (StationOrderBy)) {
+                StationOrderBy value;
+                obj.get (prop.name, out value);
+                builder.append_printf ("_%s=%s_", prop.name, value.to_string ());
+            } else if (prop.value_type == typeof (uint)) {
+                uint value;
+                obj.get (prop.name, out value);
+                builder.append_printf ("_%s=%s_", prop.name, value.to_string ());
+            } else {
+                assert_not_reached ();
+            }
+        });
+    }
+    /**
+     * OPTIONAL, name of the attribute the result list will be sorted by, default is name.
+     * Possible values: name, url, homepage, favicon, tags, country, state, language, votes, codec, bitrate, lastcheckok, lastchecktime, clicktimestamp, clickcount, clicktrend, random
+     */
+    public StationOrderBy order { get; set; default = StationOrderBy.NAME; }
+    /** OPTIONAL, reverse the result list if set to true. */
+    public bool reverse { get; set; default = false; }
+
+    /** OPTIONAL, starting value of the result list from the database.
+     * For example, if you want to do paging on the server side.
+     */
+    public uint offset { get; set; default = 0; }
+
+    /** OPTIONAL, number of returned datarows (stations) starting with offset. */
+    public uint limit { get; set; default = 100000; }
+
+    /** do list/not list broken stations, default is false */
+    public bool hidebrocken { get; set; default = false; }
+
+    /**
+     * Build a string containing pairs of "key=value",
+     * if multiple have been changed from the default, then append "&" as a separator
+     */
+    public string build_request_params () {
+        // replace _ _ placeholder with &
+        for (var i = 0; i < builder.len; i++) {
+            if ((builder.str[i] == '_') && (builder.str[i + 1] == '_')) {
+                builder.str = builder.str.splice (i, i + 2, "&");
+            }
+        }
+        // remove leading/trailing _
+        builder.str = builder.str.replace ("_", "");
+        if (builder.str != "" && (builder.str.get_char (0) != '?')) builder.prepend_c ('?');
+        return builder.str;
     }
 }
