@@ -140,9 +140,10 @@ public class Gtk4Radio.NetworkController {
      * @param query_filter Instance of {@link StationQueryFilter}, if null will return all stations.
      * @return list of stations.
      */
-    public async Gee.ArrayList<Station> list_stations_by (SearchBy search_by, StationQueryFilter query_filter) throws Gtk4Radio.Error {
+    public async Gee.ArrayList<Station> list_stations_by (SearchBy search_by, string search_term, StationListFilter filter) throws Gtk4Radio.Error {
         string resource = @"/json/stations/$search_by/";
-        resource += query_filter.build_request_params ();
+        resource += search_term;
+        resource += filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
 
@@ -152,12 +153,13 @@ public class Gtk4Radio.NetworkController {
     /**
      * List all **Stations**, Adjustment can be made through the search filter.
      *
-     * @param search_filter Instance of {@link StationQueryFilter}, if null will return all stations.
+     * @param query_filter Instance of {@link StationQueryFilter}.
      * @return {@link GLib.InputStream} of Stations.
      */
-    public async GLib.InputStream? list_stations_by_stream (SearchBy search_by, StationQueryFilter query_filter) throws Gtk4Radio.Error {
+    public async GLib.InputStream ? list_stations_by_stream (SearchBy search_by, string search_term, StationListFilter filter) throws Gtk4Radio.Error {
         string resource = @"/json/stations/$search_by/";
-        resource += query_filter.build_request_params ();
+        resource += search_term;
+        resource += filter.build_request_params ();
         string uri_string = api_url + resource;
 
         GLib.InputStream stream = null;
@@ -183,7 +185,22 @@ public class Gtk4Radio.NetworkController {
      * @return list of stations in Gee.ArrayList.
      */
     public async Gee.ArrayList<Station> list_all_stations () throws Gtk4Radio.Error {
-        string resource = "/json/stations/";
+        string resource = "/json/stations";
+
+        Json.Node ? root = yield send_message_request_async (resource);
+
+        return decode_json_array<Station> (root);
+    }
+
+    /**
+     * Advanced Station Search.
+     *
+     * @param query_filter Instance of {@link StationQueryFilter}.
+     * @return list of stations in Gee.ArrayList.
+     */
+    public async Gee.ArrayList<Station> search_stations (StationQueryFilter query_filter) throws Gtk4Radio.Error {
+        string resource = "/json/stations/search";
+        resource += query_filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
 
@@ -195,8 +212,8 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of stations in Gee.ArrayList.
      */
-    public async GLib.InputStream? list_all_stations_stream () throws Gtk4Radio.Error {
-        string resource = @"/json/stations/";
+    public async GLib.InputStream ? list_all_stations_stream () throws Gtk4Radio.Error {
+        string resource = @"/json/stations";
         string uri_string = api_url + resource;
 
         GLib.InputStream stream = null;
@@ -315,6 +332,7 @@ public class Gtk4Radio.NetworkController {
         string resource = @"/json/vote/$station_uuid";
 
         Json.Node ? root = yield send_message_request_async (resource);
+
         Json.Object ? obj = root.get_object ();
         if (obj != null) {
             string ok = obj.get_string_member ("ok");
@@ -357,6 +375,7 @@ public class Gtk4Radio.NetworkController {
         string resource = @"/json/add$(builder.str)";
 
         Json.Node ? root = yield send_message_request_async (resource);
+
         Json.Object ? obj = root.get_object ();
         if (obj != null) {
             string ok = obj.get_string_member ("ok");
