@@ -92,6 +92,7 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
         if (add_https_prefix && !fastest_url.has_prefix ("https://")) {
             return "https://" + fastest_url;
         } else {
+            debug ("Fastest Url: %s\n", fastest_url);
             return fastest_url;
         }
     }
@@ -175,6 +176,7 @@ public enum Gtk4Radio.NetworkProtocol {
         EnumClass enumc = (EnumClass) typeof (NetworkProtocol).class_ref ();
         unowned EnumValue ? eval = enumc.get_value (this);
         return_val_if_fail (eval != null, null);
+        debug ("Network Protocol is: %s", eval.value_nick);
         return eval.value_nick;
     }
 }

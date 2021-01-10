@@ -164,7 +164,7 @@ public class Gtk4Radio.NetworkController {
 
         GLib.InputStream stream = null;
 
-        print (uri_string + "\n");
+        debug (uri_string + "\n");
 
         var msg = new Soup.Message ("POST", uri_string);
         try {
@@ -218,7 +218,7 @@ public class Gtk4Radio.NetworkController {
 
         GLib.InputStream stream = null;
 
-        print (uri_string + "\n");
+        debug (uri_string + "\n");
 
         var msg = new Soup.Message ("POST", uri_string);
         try {
@@ -338,6 +338,8 @@ public class Gtk4Radio.NetworkController {
             string ok = obj.get_string_member ("ok");
             string str_message = obj.get_string_member ("message");
 
+            debug ("vote_for_station result: %s, %s\n", ok, str_message);
+
             if (ok == "true") {
                 message (@"Voted Successfully: $str_message");
                 return true;
@@ -382,6 +384,8 @@ public class Gtk4Radio.NetworkController {
             string str_message = obj.get_string_member ("message");
             string station_id = obj.get_string_member ("uuid");
 
+            debug ("add_station result: %s, %s, %s\n", ok, str_message, station_id);
+
             if (ok == "true") {
                 message (@"Added Station Successfully: $str_message\nNew Station ID: $station_id");
                 return true;
@@ -397,7 +401,7 @@ public class Gtk4Radio.NetworkController {
         var parser = new Json.Parser ();
         string uri_string = api_url + resource;
 
-        print (uri_string + "\n");
+        debug (uri_string + "\n");
 
         var msg = new Soup.Message ("POST", uri_string);
         try {
@@ -412,18 +416,19 @@ public class Gtk4Radio.NetworkController {
                     this.finished_json_parsing ();
                     return root;
                 } catch (GLib.Error err) {
-                    throw new Error.ParsingError ("NetworkController:list_all_stations:Couldn't parse Json: %s\n", err.message);
+                    throw new Error.ParsingError ("NetworkController:send_message_request_async:Couldn't parse Json: %s\n", err.message);
                 }
             } else {
                 return null;
             }
         } catch (GLib.Error err) {
-            throw new Error.NetworkError ("NetworkController:list_all_stations:Couldn't get stations: %s\n", err.message);
+            throw new Error.NetworkError ("NetworkController:send_message_request_async:Couldn't get stations: %s\n", err.message);
         }
     }
 
     bool check_response_status (Soup.Message msg) throws Gtk4Radio.Error {
         if (msg.status_code != Soup.Status.OK) {
+            debug ("check_response_status result: %s, %s\n", msg.status_code.to_string (), msg.reason_phrase);
             throw new Error.NetworkError ("NetworkControllert:check_response_status: %s\n", msg.reason_phrase);
         } else {
             return true;
