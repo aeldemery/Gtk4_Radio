@@ -60,7 +60,7 @@ public class Gtk4Radio.ListFilter : Object {
         // remove leading/trailing _ and / and any wierd symbols
         builder.str = builder.str.replace ("_", "");
 
-        if (builder.str != "" && (builder.str.get_char(0) != '?')) builder.prepend_c ('?');
+        if (builder.str != "" && (builder.str.get_char (0) != '?')) builder.prepend_c ('?');
 
         /*
            if (search_term != "") {
