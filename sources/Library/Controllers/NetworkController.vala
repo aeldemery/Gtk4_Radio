@@ -6,6 +6,7 @@
 /** Client controller to access the web service. */
 public class Gtk4Radio.NetworkController {
     Soup.Session session;
+    SessionManager session_mgr;
     string user_agent;
     string api_url;
 
@@ -28,10 +29,8 @@ public class Gtk4Radio.NetworkController {
         this.api_url = api_url;
         this.user_agent = user_agent;
 
-        session = new Soup.Session ();
-        session.user_agent = @"$APP_ID/$APP_VERSION";
-        session.max_conns = 8;
-        session.timeout = 15;
+        session_mgr = new SessionManager.init (user_agent);
+        session = session_mgr.get_instance ();
     }
 
     /**
