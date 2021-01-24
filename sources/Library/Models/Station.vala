@@ -7,7 +7,7 @@
  * This models the Station structure as per
  * https://de1.api.radio-browser.info/
  */
-public class Gtk4Radio.Station : Object, Json.Serializable {
+public class Gtk4Radio.Station : GLib.Object, Json.Serializable {
 
     /** A globally unique identifier for the change of the station information */
     public string changeuuid { get; set; default = ""; }

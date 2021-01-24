@@ -7,7 +7,7 @@
  * Advanced station search filters.
  * It will search for the station whose attribute contains the search term.
  */
-public class Gtk4Radio.StationQueryFilter : Object {
+public class Gtk4Radio.StationQueryFilter : GLib.Object {
     /** MANDATORY if search by uuid of the station, otherwise OPTIONAL. */
     public string uuid  { get; set; default = ""; }
 
@@ -83,7 +83,7 @@ public class Gtk4Radio.StationQueryFilter : Object {
     /** do list/not list broken stations, default is false */
     public bool hidebrocken { get; set; default = false; }
 
-    StringBuilder builder;
+    GLib.StringBuilder builder;
 
     public StationQueryFilter () {
         builder = new StringBuilder ();
@@ -152,8 +152,8 @@ public enum Gtk4Radio.StationOrderBy {
 
     /** Return string representions of enum members. */
     public string to_string () {
-        EnumClass enumc = (EnumClass) typeof (StationOrderBy).class_ref ();
-        unowned EnumValue ? eval = enumc.get_value (this);
+        var enumc = (GLib.EnumClass) typeof (StationOrderBy).class_ref ();
+        unowned GLib.EnumValue ? eval = enumc.get_value (this);
         return_val_if_fail (eval != null, null);
         return eval.value_nick;
     }
@@ -208,8 +208,8 @@ public enum Gtk4Radio.SearchBy {
  * Filter to pass for station search by name/uuid/country ...etc.
  * This is different from {@link Gtk4Radio.StationQueryFilter} because it contains limited parameters.
  */
-public class Gtk4Radio.StationListFilter : Object {
-    StringBuilder builder;
+public class Gtk4Radio.StationListFilter : GLib.Object {
+    GLib.StringBuilder builder;
 
     public StationListFilter () {
         builder = new StringBuilder ();

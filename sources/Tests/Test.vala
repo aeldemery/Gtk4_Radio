@@ -214,6 +214,15 @@ int main (string[] args) {
             loop.quit ();
         });
         loop.run ();
+
+        // var favicon_url = stations_by_votes[0].favicon;
+        // var favicon_downloader = new Gtk4Radio.FaviconDownloader ();
+        // favicon_downloader.get_favicon.begin (favicon_url, (obj, res) => {
+        // var image = favicon_downloader.get_favicon.end (res);
+        ////print (image.get_icon_name ());
+        // loop.quit ();
+        // });
+        // loop.run ();
     } catch (Gtk4Radio.Error err) {
         critical (err.message);
         return -1;

@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 /** Web service stats. */
-public class Gtk4Radio.ServerStats : Object {
+public class Gtk4Radio.ServerStats : GLib.Object {
     public int clicks_last_day { get; set; default = 0; }
     public int clicks_last_hour { get; set; default = 0; }
     public int countries { get; set; default = 0; }

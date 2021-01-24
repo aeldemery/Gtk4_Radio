@@ -7,8 +7,8 @@
  * ListFilter to pass as an argument to list retrieval functions,
  * for example `list_countries`, `list_codecs`, `list_states` ...
  */
-public class Gtk4Radio.ListFilter : Object {
-    StringBuilder builder;
+public class Gtk4Radio.ListFilter : GLib.Object {
+    GLib.StringBuilder builder;
 
     /**
      * {@inheritDoc}

@@ -6,7 +6,7 @@
 /**
  * Lookup DNS server list, find the fastest server
  */
-public class Gtk4Radio.EndpoinDiscovery : Object {
+public class Gtk4Radio.EndpoinDiscovery : GLib.Object {
     Soup.Session session;
 
     /**
@@ -105,14 +105,19 @@ public class Gtk4Radio.EndpoinDiscovery : Object {
      * @throw NetworkError
      */
     public Gtk4Radio.ServerStats get_server_stats (string api_url) throws Gtk4Radio.Error {
-        string content_type;
-
+        // string content_type;
         try {
-            GLib.Bytes bytes = session.load_uri_bytes (api_url, null, out content_type);
-            var str = (string) bytes.get_data ();
+            var message = new Soup.Message ("GET", api_url);
+            GLib.InputStream stream = session.send (message);
+
+            // GLib.Bytes bytes = session.load_uri_bytes (api_url, null, out content_type);
+            // var str = (string) bytes.get_data ();
 
             try {
-                Json.Node root = (!)Json.from_string (str);
+                var parser = new Json.Parser ();
+                parser.load_from_stream (stream);
+                // Json.Node root = (!)Json.from_string (str);
+                Json.Node root = parser.get_root ();
 
                 var result = (ServerStats) Json.gobject_deserialize (typeof (Gtk4Radio.ServerStats), root);
                 return result;
@@ -173,8 +178,8 @@ public enum Gtk4Radio.NetworkProtocol {
     TFTP;
 
     public string to_string () {
-        EnumClass enumc = (EnumClass) typeof (NetworkProtocol).class_ref ();
-        unowned EnumValue ? eval = enumc.get_value (this);
+        var enumc = (GLib.EnumClass) typeof (NetworkProtocol).class_ref ();
+        unowned GLib.EnumValue ? eval = enumc.get_value (this);
         return_val_if_fail (eval != null, null);
         debug ("Network Protocol is: %s", eval.value_nick);
         return eval.value_nick;

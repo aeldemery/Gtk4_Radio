@@ -6,7 +6,6 @@
 /** Client controller to access the web service. */
 public class Gtk4Radio.NetworkController {
     Soup.Session session;
-    SessionManager session_mgr;
     string user_agent;
     string api_url;
 
@@ -29,8 +28,10 @@ public class Gtk4Radio.NetworkController {
         this.api_url = api_url;
         this.user_agent = user_agent;
 
-        session_mgr = new SessionManager.init (user_agent);
-        session = session_mgr.get_instance ();
+        session = new Soup.Session ();
+        session.user_agent = user_agent;
+        session.max_conns = 8;
+        session.timeout = 15;
     }
 
     /**
@@ -167,7 +168,7 @@ public class Gtk4Radio.NetworkController {
 
         var msg = new Soup.Message ("POST", uri_string);
         try {
-            stream = yield session.send_async (msg, Priority.DEFAULT);
+            stream = yield session.send_async (msg, GLib.Priority.DEFAULT);
 
             if (check_response_status (msg) == true) {
                 return stream;
@@ -221,7 +222,7 @@ public class Gtk4Radio.NetworkController {
 
         var msg = new Soup.Message ("POST", uri_string);
         try {
-            stream = yield session.send_async (msg, Priority.DEFAULT);
+            stream = yield session.send_async (msg, GLib.Priority.DEFAULT);
 
             if (check_response_status (msg) == true) {
                 return stream;
@@ -404,7 +405,7 @@ public class Gtk4Radio.NetworkController {
 
         var msg = new Soup.Message ("POST", uri_string);
         try {
-            GLib.InputStream stream = yield session.send_async (msg, Priority.DEFAULT);
+            GLib.InputStream stream = yield session.send_async (msg, GLib.Priority.DEFAULT);
 
             if (check_response_status (msg) == true) {
                 try {
@@ -426,11 +427,12 @@ public class Gtk4Radio.NetworkController {
     }
 
     bool check_response_status (Soup.Message msg) throws Gtk4Radio.Error {
-        if (msg.status_code != Soup.Status.OK) {
+        if (msg.status_code == Soup.Status.OK) {
+            debug ("check_response_status result: %s, %s\n", msg.status_code.to_string (), msg.reason_phrase);
+            return true;
+        } else {
             debug ("check_response_status result: %s, %s\n", msg.status_code.to_string (), msg.reason_phrase);
             throw new Error.NetworkError ("NetworkControllert:check_response_status: %s\n", msg.reason_phrase);
-        } else {
-            return true;
         }
     }
 

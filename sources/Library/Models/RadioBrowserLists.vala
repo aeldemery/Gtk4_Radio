@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 /** Object represent a Country in a list of all countries in the database. */
-public class Gtk4Radio.Country : Object {
+public class Gtk4Radio.Country : GLib.Object {
     public string name { get; set; default = ""; }
     public int stationcount { get; set; default = 0; }
 
@@ -14,7 +14,7 @@ public class Gtk4Radio.Country : Object {
 }
 
 /** Object represent a Country Code in a list of all countries in the database. */
-public class Gtk4Radio.CountryCode : Object {
+public class Gtk4Radio.CountryCode : GLib.Object {
     public string name { get; set; default = ""; }
     public int stationcount { get; set; default = 0; }
 
@@ -24,7 +24,7 @@ public class Gtk4Radio.CountryCode : Object {
 }
 
 /** Object represent a Codec in a list of all codecs in the database. */
-public class Gtk4Radio.Codec : Object {
+public class Gtk4Radio.Codec : GLib.Object {
     public string name { get; set; default = ""; }
     public int stationcount { get; set; default = 0; }
 
@@ -34,7 +34,7 @@ public class Gtk4Radio.Codec : Object {
 }
 
 /** Object represent a State of a Contry in a list of all states in the database. */
-public class Gtk4Radio.State : Object {
+public class Gtk4Radio.State : GLib.Object {
     public string name { get; set; default = ""; }
     public string country { get; set; default = ""; }
     public int stationcount { get; set; default = 0; }
@@ -45,7 +45,7 @@ public class Gtk4Radio.State : Object {
 }
 
 /** Object represent a Language in a list of all languages in the database. */
-public class Gtk4Radio.Language : Object {
+public class Gtk4Radio.Language : GLib.Object {
     public string name { get; set; default = ""; }
     public int stationcount { get; set; default = 0; }
 
@@ -55,7 +55,7 @@ public class Gtk4Radio.Language : Object {
 }
 
 /** Object represent a Tag in a list of all tags in the database. */
-public class Gtk4Radio.Tag : Object {
+public class Gtk4Radio.Tag : GLib.Object {
     public string name { get; set; default = ""; }
     public int stationcount { get; set; default = 0; }
 

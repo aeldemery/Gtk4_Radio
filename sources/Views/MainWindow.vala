@@ -10,11 +10,14 @@ public class Gtk4Radio.MainWindow : Gtk.ApplicationWindow {
         this.default_height = 600;
         this.default_width = 800;
 
-        var station_model = new StationsListModel ();
-        var station_view = new StationColumnView (station_model);
+        // var station_model = new StationsListModel ();
+        // var station_view = new StationColumnView (station_model);
 
-        station_view.hexpand = station_view.vexpand = true;
+        // station_view.hexpand = station_view.vexpand = true;
 
-        this.set_child (station_view);
+        var favicon_grid = new FaviconGridView ();
+        favicon_grid.hexpand = favicon_grid.vexpand = true;
+
+        this.set_child (favicon_grid);
     }
 }
