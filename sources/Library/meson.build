@@ -12,13 +12,14 @@ lib_sources = files (
 )
 
 lib_dependencies = [
-    dependency ('glib-2.0', version: '>=2.66'),
-    dependency ('gobject-2.0'),
-    dependency ('libsoup-3.0'),
-    dependency ('json-glib-1.0'),
-    dependency ('gee-0.8'),
-    dependency ('gio-2.0'),
-    dependency ('gtk4'),
+    glib_dep,
+    gobject_dep,
+    gtk4_dep,
+    libsoup_dep,
+    json_dep,
+    gee_dep,
+    gio_dep,
+    pixbuf_dep,
 ]
 
 lib_inc = include_directories ('.')
@@ -28,6 +29,7 @@ radio_browser_lib = library (
     config_constants,
     sources: lib_sources,
     dependencies: lib_dependencies,
+    include_directories: [lib_inc, config_include,],
     install: true,
     install_dir: [true, true, true],
 )
