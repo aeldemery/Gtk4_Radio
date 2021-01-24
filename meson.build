@@ -12,7 +12,12 @@ USER_AGENT = APP_ID + '/' + APP_VERSION
 vapi_dir = ['/opt/share/vala/vapi']
 
 add_project_arguments(
-    ['--vapidir', vapi_dir],
+    [
+        '--vapidir', vapi_dir, 
+        '--debug', 
+        '--save-temps',
+        #'--enable-experimental-non-null',
+    ],
     language: 'vala',
 )
 
@@ -27,16 +32,16 @@ config_constants = configure_file (
     output: 'Constants.vala',
     configuration: conf_data
 )
+config_include = include_directories ('.')
 
-external_dependencies = [
-    dependency ('glib-2.0', version: '>=2.66'),
-    dependency ('gobject-2.0'),
-    dependency ('gtk4', version: '>=4.0'),
-    dependency ('libsoup-3.0'),
-    dependency ('json-glib-1.0'),
-    dependency ('gee-0.8'),
-    dependency ('gio-2.0'),
-]
+glib_dep = dependency ('glib-2.0', version: '>=2.66')
+gobject_dep = dependency ('gobject-2.0')
+gtk4_dep = dependency ('gtk4', version: '>=4.0')
+libsoup_dep = dependency ('libsoup-3.0')
+json_dep = dependency ('json-glib-1.0')
+gee_dep = dependency ('gee-0.8')
+gio_dep = dependency ('gio-2.0')
+pixbuf_dep = dependency ('gdk-pixbuf-2.0')
 
 subdir ('resources')
 subdir ('sources')
