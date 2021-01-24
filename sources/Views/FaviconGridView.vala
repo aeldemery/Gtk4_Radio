@@ -12,6 +12,9 @@ public class Gtk4Radio.FaviconGridView : Gtk.Widget {
     construct {
         sw = new Gtk.ScrolledWindow ();
         gridview = new Gtk.GridView (null, null);
+        gridview.enable_rubberband = true;
+        gridview.margin_bottom = gridview.margin_end = gridview.margin_start = gridview.margin_top = 20;
+        gridview.max_columns = 10;
         factory = new Gtk.SignalListItemFactory ();
     }
 
@@ -53,7 +56,7 @@ public class Gtk4Radio.FaviconGridView : Gtk.Widget {
 
     void construct_station_list () {
         var loop = new MainLoop (GLib.MainContext.default ());
-        controller.list_stations_by_votes.begin (100, (obj, res) => {
+        controller.list_stations_by_votes.begin (300, (obj, res) => {
             try {
                 stations_by_votes = controller.list_stations_by_votes.end (res);
             } catch (Gtk4Radio.Error err) {
@@ -69,11 +72,18 @@ public class Gtk4Radio.FaviconGridView : Gtk.Widget {
         var loop = new MainLoop (GLib.MainContext.default ());
         foreach (var station in stations_by_votes) {
             favicon_downloader.get_favicon_pixbuf.begin (station.favicon, (obj, res) => {
-                var pixbuf = favicon_downloader.get_favicon_pixbuf.end (res);
-                if (pixbuf != null) icons.append (pixbuf);
-                loop.quit ();
+            var pixbuf = favicon_downloader.get_favicon_pixbuf.end (res);
+            if (pixbuf != null) icons.append (pixbuf);
+            loop.quit ();
             });
             loop.run ();
+
+            //  favicon_downloader.get_favicon_texture.begin (station.favicon, (obj, res) => {
+            //      var texture = favicon_downloader.get_favicon_texture.end (res);
+            //      if (texture != null) icons.append (texture);
+            //      loop.quit ();
+            //  });
+            //  loop.run ();
         }
     }
 
@@ -84,14 +94,16 @@ public class Gtk4Radio.FaviconGridView : Gtk.Widget {
 
     void setup_gridview_item (Gtk.SignalListItemFactory factory, Gtk.ListItem item) {
         var image = new Gtk.Image ();
-        image.set_size_request (64, 64);
+        image.set_size_request (196, 196);
         item.set_child (image);
     }
 
     void bind_gridview_item (Gtk.SignalListItemFactory factory, Gtk.ListItem item) {
         var image = (Gtk.Image)item.get_child ();
         var pixbuf = (Gdk.Pixbuf)item.get_item ();
+        // var texture = (Gdk.Texture)item.get_item ();
 
         image.set_from_pixbuf (pixbuf);
+        // image.set_from_paintable (texture.get_current_image ());
     }
 }

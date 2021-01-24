@@ -16,7 +16,7 @@ public class Gtk4Radio.EndpoinDiscovery : GLib.Object {
     public EndpoinDiscovery (string user_agent) {
         session = new Soup.Session ();
         session.user_agent = user_agent;
-        session.max_conns = 8;
+        session.max_conns = 256;
         session.timeout = 15;
     }
 

@@ -22,3 +22,5 @@ It doesn't do anything usefull __yet__. So probably you don't want to.
 ## Screenshot <a name = "usage"></a>
 
 ![Screenshot](Screenshot1.png)
+
+![Screenshot2](Screenshot2.png)

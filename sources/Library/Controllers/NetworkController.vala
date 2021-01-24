@@ -30,7 +30,7 @@ public class Gtk4Radio.NetworkController {
 
         session = new Soup.Session ();
         session.user_agent = user_agent;
-        session.max_conns = 8;
+        session.max_conns = 256;
         session.timeout = 15;
     }
 

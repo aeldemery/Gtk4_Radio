@@ -14,31 +14,24 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
     }
 
     public async Gdk.Texture ? get_favicon_texture (string url) {
-        if (check_url_is_valid (url) != true) {
-            return null;
-        }
-
         Gdk.Texture texture = null;
-        var message = new Soup.Message ("GET", url);
+        Gdk.Pixbuf pixbuf = yield yield fetch_pixbuf (url);
 
-        if (message != null) {
-            try {
-                GLib.InputStream stream = yield session.send_async (message, GLib.Priority.DEFAULT);
-
-                var pixbuf = yield new Gdk.Pixbuf.from_stream_async (stream);
-                Gdk.MemoryFormat memory_format = pixbuf.has_alpha ?
-                                                 Gdk.MemoryFormat.R8G8B8A8_PREMULTIPLIED :
-                                                 Gdk.MemoryFormat.R8G8B8;
-                texture = new Gdk.MemoryTexture (196, 196, memory_format, pixbuf.pixel_bytes, pixbuf.rowstride);
-            } catch (GLib.Error err) {
-                info ("Couldn't Load Icon: %s\n", err.message);
-            }
+        if (pixbuf != null) {
+            Gdk.MemoryFormat memory_format = pixbuf.has_alpha ?
+                                             Gdk.MemoryFormat.R8G8B8A8_PREMULTIPLIED :
+                                             Gdk.MemoryFormat.R8G8B8;
+            texture = new Gdk.MemoryTexture (196, 196, memory_format, pixbuf.pixel_bytes, pixbuf.rowstride);
         }
 
         return texture;
     }
 
     public async Gdk.Pixbuf ? get_favicon_pixbuf (string url) {
+        return yield fetch_pixbuf (url);
+    }
+
+    async Gdk.Pixbuf ? fetch_pixbuf (string url) {
         if (check_url_is_valid (url) != true) {
             return null;
         }
@@ -48,7 +41,6 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
 
         if (message != null) {
             try {
-                // print ("Fetching Image from: %s\n", url);
                 GLib.InputStream stream = yield session.send_async (message, GLib.Priority.DEFAULT);
 
                 if (check_response_status (message) && check_content_type_is_image (message, stream)) {
