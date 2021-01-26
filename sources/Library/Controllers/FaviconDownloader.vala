@@ -73,7 +73,7 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
         } else {
             try {
                 bool uncertain = true;
-                string type = GLib.ContentType.guess (null, stream.read_bytes (8192, null).get_data (), out uncertain);
+                string type = GLib.ContentType.guess (null, stream.read_bytes (4096, null).get_data (), out uncertain);
 
                 if (uncertain == false && type.contains ("image")) {
                     return true;
