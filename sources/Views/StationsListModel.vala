@@ -11,7 +11,7 @@ public class Gtk4Radio.StationsListModel : GLib.Object, GLib.ListModel {
     Gee.ArrayList<Station> all_stations;
 
     construct {
-        var endpoint = new EndpoinDiscovery (USER_AGENT);
+        var endpoint = new EndpoinDiscovery ();
         try {
             Gee.ArrayList<string> urls = endpoint.get_api_urls ("radio-browser.info", "api");
             string url = endpoint.get_fastest_api_url (urls);

@@ -27,7 +27,7 @@ public class Gtk4Radio.FaviconGridView : Gtk.Widget {
         stations_by_votes = new Gee.ArrayList<Station> ();
 
         try {
-            var endpoint = new EndpoinDiscovery (USER_AGENT);
+            var endpoint = new EndpoinDiscovery ();
             var urls = endpoint.get_api_urls ("radio-browser.info", "api");
             api_url = urls[0];
         } catch (Gtk4Radio.Error err) {
@@ -56,7 +56,7 @@ public class Gtk4Radio.FaviconGridView : Gtk.Widget {
 
     void construct_station_list () {
         var loop = new MainLoop (GLib.MainContext.default ());
-        controller.list_stations_by_votes.begin (300, (obj, res) => {
+        controller.list_stations_by_votes.begin (1000, (obj, res) => {
             try {
                 stations_by_votes = controller.list_stations_by_votes.end (res);
             } catch (Gtk4Radio.Error err) {
@@ -72,18 +72,18 @@ public class Gtk4Radio.FaviconGridView : Gtk.Widget {
         var loop = new MainLoop (GLib.MainContext.default ());
         foreach (var station in stations_by_votes) {
             favicon_downloader.get_favicon_pixbuf.begin (station.favicon, (obj, res) => {
-            var pixbuf = favicon_downloader.get_favicon_pixbuf.end (res);
-            if (pixbuf != null) icons.append (pixbuf);
-            loop.quit ();
+                var pixbuf = favicon_downloader.get_favicon_pixbuf.end (res);
+                if (pixbuf != null) icons.append (pixbuf);
+                loop.quit ();
             });
             loop.run ();
 
-            //  favicon_downloader.get_favicon_texture.begin (station.favicon, (obj, res) => {
-            //      var texture = favicon_downloader.get_favicon_texture.end (res);
-            //      if (texture != null) icons.append (texture);
-            //      loop.quit ();
-            //  });
-            //  loop.run ();
+            // favicon_downloader.get_favicon_texture.begin (station.favicon, (obj, res) => {
+            // var texture = favicon_downloader.get_favicon_texture.end (res);
+            // if (texture != null) icons.append (texture);
+            // loop.quit ();
+            // });
+            // loop.run ();
         }
     }
 

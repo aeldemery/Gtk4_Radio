@@ -9,7 +9,7 @@ int main (string[] args) {
 
     GLib.Intl.setlocale ();
     try {
-        var endpoint = new Gtk4Radio.EndpoinDiscovery (Gtk4Radio.USER_AGENT);
+        var endpoint = new Gtk4Radio.EndpoinDiscovery ();
         var urls = endpoint.get_api_urls ("radio-browser.info", "api");
         var controller = new Gtk4Radio.NetworkController (urls[0], Gtk4Radio.USER_AGENT);
 

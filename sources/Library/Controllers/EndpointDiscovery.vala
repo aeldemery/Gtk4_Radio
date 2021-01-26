@@ -11,11 +11,9 @@ public class Gtk4Radio.EndpoinDiscovery : GLib.Object {
 
     /**
      * {@inheritDoc}
-     * @param user_agent string user_agent to pass to the server.
      */
-    public EndpoinDiscovery (string user_agent) {
+    public EndpoinDiscovery () {
         session = new Soup.Session ();
-        session.user_agent = user_agent;
         session.max_conns = 256;
         session.timeout = 15;
     }
