@@ -1,5 +1,6 @@
 <?xml version = "1.0" encoding = "UTF-8" ?>
-<gresources prefix = "/gtk4_radio">
-    <gresource>
+<gresources>
+    <gresource prefix = "/gtk4_radio/">
+        <file>images/image-not-found.svg</file>
     </gresource>
 </gresources>

@@ -32,13 +32,17 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
     }
 
     async Gdk.Pixbuf ? fetch_pixbuf (string url) {
-        if (check_url_is_valid (url) != true) {
-            return null;
-        }
-
         Gdk.Pixbuf pixbuf = null;
-        var message = new Soup.Message ("GET", url);
 
+        if (check_url_is_valid (url) != true) {
+            try {
+                return pixbuf = new Gdk.Pixbuf.from_resource("/gtk4_radio/images/image-not-found.svg");
+            } catch (GLib.Error err) {
+                warning ("Couldn't create pixbuf from resource: %s\n", err.message);
+            }
+        }
+        
+        var message = new Soup.Message ("GET", url);
         if (message != null) {
             try {
                 GLib.InputStream stream = yield session.send_async (message, GLib.Priority.DEFAULT);
