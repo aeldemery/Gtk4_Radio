@@ -9,6 +9,8 @@ lib_sources = files (
     'Controllers/NetworkController.vala',
     'Controllers/EndpointDiscovery.vala',
     'Controllers/FaviconDownloader.vala',
+
+    'Utils/Utils.vala',
 )
 
 lib_dependencies = [
