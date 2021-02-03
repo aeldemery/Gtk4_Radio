@@ -8,14 +8,25 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
 
     public FaviconDownloader () {
         session = new Soup.Session ();
-        session.user_agent = USER_AGENT;
+        // session.user_agent = USER_AGENT;
         session.max_conns = 256;
         session.timeout = 15;
     }
 
-    public async Gdk.Texture ? get_favicon_texture (string url) {
+    /**
+     * Async Version: Download a favicon url into {@Gdk.Texture}
+     * Currently it doesn't decode image correctly.
+     *
+     * @param url address to download from.
+     * @return Gdk.Texture texture data with constant size.
+     */
+    public async Gdk.Texture ? get_favicon_texture_async (string url) {
+        if (Utils.check_url_is_valid (url) != true) {
+            return null;
+        }
+
         Gdk.Texture texture = null;
-        Gdk.Pixbuf pixbuf = yield yield fetch_pixbuf (url);
+        Gdk.Pixbuf pixbuf = yield fetch_pixbuf_async (url);
 
         if (pixbuf != null) {
             Gdk.MemoryFormat memory_format = pixbuf.has_alpha ?
@@ -27,74 +38,116 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
         return texture;
     }
 
-    public async Gdk.Pixbuf ? get_favicon_pixbuf (string url) {
-        return yield fetch_pixbuf (url);
+    /**
+     * Async Version: Download a favicon url into {@Gdk.Texture}
+     * Currently it doesn't decode image correctly.
+     *
+     * @param url address to download from.
+     * @return Gdk.Texture texture data with constant size.
+     */
+    public Gdk.Texture ? get_favicon_texture (string url) {
+        if (Utils.check_url_is_valid (url) != true) {
+            return null;
+        }
+
+        Gdk.Texture texture = null;
+        Gdk.Pixbuf pixbuf = fetch_pixbuf (url);
+
+        if (pixbuf != null) {
+            Gdk.MemoryFormat memory_format = pixbuf.has_alpha ?
+                                             Gdk.MemoryFormat.R8G8B8A8_PREMULTIPLIED :
+                                             Gdk.MemoryFormat.R8G8B8;
+            texture = new Gdk.MemoryTexture (196, 196, memory_format, pixbuf.pixel_bytes, pixbuf.rowstride);
+        }
+
+        return texture;
     }
 
-    async Gdk.Pixbuf ? fetch_pixbuf (string url) {
+    /**
+     * Async Version: Download a favicon url into {@Gdk.Pixbuf}
+     *
+     * @param url address to download from.
+     * @return Gdk.Pixbuf contains pixbuf data.
+     */
+    public async Gdk.Pixbuf ? get_favicon_pixbuf_async (string url) {
+        return yield fetch_pixbuf_async (url);
+    }
+
+    /**
+     * Download a favicon url into {@Gdk.Pixbuf}
+     *
+     * @param url address to download from.
+     * @return Gdk.Pixbuf contains pixbuf data.
+     */
+    public Gdk.Pixbuf ? get_favicon_pixbuf (string url) {
+        return fetch_pixbuf (url);
+    }
+
+    /**
+     * Download a favicon url into {@Gdk.Pixbuf}.
+     * If it couldn't be downloaded, return placeholder image instead.
+     *
+     * @param url address to download from.
+     * @return Gdk.Pixbuf contains pixbuf data or placeholder image.
+     */
+    public Gdk.Pixbuf get_favicon_pixbuf_else_placeholder (string url) {
+        var pixbuf = fetch_pixbuf (url);
+        if (pixbuf == null) {
+            return Utils.load_pic_not_found ();
+        } else {
+            return pixbuf;
+        }
+    }
+
+    /*
+     * Private methods
+     */
+    async Gdk.Pixbuf ? fetch_pixbuf_async (string url) {
+        if (Utils.check_url_is_valid (url) != true) {
+            return null;
+        }
+
         Gdk.Pixbuf pixbuf = null;
 
-        if (check_url_is_valid (url) != true) {
-            try {
-                return pixbuf = new Gdk.Pixbuf.from_resource("/gtk4_radio/images/image-not-found.svg");
-            } catch (GLib.Error err) {
-                warning ("Couldn't create pixbuf from resource: %s\n", err.message);
-            }
-        }
-        
         var message = new Soup.Message ("GET", url);
         if (message != null) {
             try {
                 GLib.InputStream stream = yield session.send_async (message, GLib.Priority.DEFAULT);
 
-                if (check_response_status (message) && check_content_type_is_image (message, stream)) {
-                    pixbuf = yield new Gdk.Pixbuf.from_stream_async (stream);
+                if (Utils.check_response_status_is_ok (message) && Utils.check_content_type_is_image (message, stream)) {
+                    return pixbuf = yield new Gdk.Pixbuf.from_stream_async (stream);
+                } else {
+                    return null;
                 }
             } catch (GLib.Error err) {
                 info ("Couldn't Load Icon: %s, form address %s.\n", err.message, url);
             }
         }
-
         return pixbuf;
     }
 
-    bool check_response_status (Soup.Message msg) throws Gtk4Radio.Error {
-        if (msg.status_code == Soup.Status.OK) {
-            debug ("check_response_status result: %s, %s\n", msg.status_code.to_string (), msg.reason_phrase);
-            return true;
-        } else {
-            debug ("check_response_status result: %s, %s\n", msg.status_code.to_string (), msg.reason_phrase);
-            throw new Error.NetworkError ("FaviconDownloader:check_response_status: %s\n", msg.reason_phrase);
+    // Private functions
+    Gdk.Pixbuf ? fetch_pixbuf (string url) {
+        if (Utils.check_url_is_valid (url) != true) {
+            return null;
         }
-    }
 
-    bool check_content_type_is_image (Soup.Message msg, GLib.InputStream stream) {
-        Soup.MessageHeaders headers = msg.get_response_headers ();
-        string content_type = headers.get_content_type (null);
+        Gdk.Pixbuf pixbuf = null;
 
-        if (content_type != null && content_type.has_prefix ("image")) {
-            return true;
-        } else {
+        var message = new Soup.Message ("GET", url);
+        if (message != null) {
             try {
-                bool uncertain = true;
-                string type = GLib.ContentType.guess (null, stream.read_bytes (4096, null).get_data (), out uncertain);
+                GLib.InputStream stream = session.send (message);
 
-                if (uncertain == false && type.contains ("image")) {
-                    return true;
+                if (Utils.check_response_status_is_ok (message) && Utils.check_content_type_is_image (message, stream)) {
+                    return pixbuf = new Gdk.Pixbuf.from_stream (stream);
+                } else {
+                    return null;
                 }
             } catch (GLib.Error err) {
-                info ("%s\n", err.message);
+                info ("Couldn't Load Icon: %s, form address %s.\n", err.message, url);
             }
         }
-        return false;
-    }
-
-    bool check_url_is_valid (string url) {
-        try {
-            return GLib.Uri.is_valid (url, GLib.UriFlags.NONE);
-        } catch (GLib.Error err) {
-            info ("Failed to parse url string: %s\n", err.message);
-            return false;
-        }
+        return pixbuf;
     }
 }
