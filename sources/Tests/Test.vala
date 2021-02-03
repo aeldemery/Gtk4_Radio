@@ -11,16 +11,16 @@ int main (string[] args) {
     try {
         var endpoint = new Gtk4Radio.EndpoinDiscovery ();
         var urls = endpoint.get_api_urls ("radio-browser.info", "api");
-        var controller = new Gtk4Radio.NetworkController (urls[0], Gtk4Radio.USER_AGENT);
+        var controller = new Gtk4Radio.NetworkController (urls[0], Constants.USER_AGENT);
 
         var loop = new MainLoop ();
 
         // Test all stations
 
         var stations = new Gee.ArrayList<Gtk4Radio.Station> ();
-        controller.list_all_stations.begin ((obj, res) => {
+        controller.list_all_stations_async.begin ((obj, res) => {
             try {
-                stations = controller.list_all_stations.end (res);
+                stations = controller.list_all_stations_async.end (res);
                 print ("Got %d Stations\n", stations.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -38,9 +38,9 @@ int main (string[] args) {
         list_filter.hide_brocken = false;
 
         var countries = new Gee.ArrayList<Gtk4Radio.Country> ();
-        controller.list_countries.begin (list_filter, (obj, res) => {
+        controller.list_countries_async.begin (list_filter, (obj, res) => {
             try {
-                countries = controller.list_countries.end (res);
+                countries = controller.list_countries_async.end (res);
                 print ("Got %d items\n", countries.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -50,9 +50,9 @@ int main (string[] args) {
         loop.run ();
 
         var countriescodes = new Gee.ArrayList<Gtk4Radio.CountryCode> ();
-        controller.list_countries_by_code.begin (list_filter, (obj, res) => {
+        controller.list_countries_by_code_async.begin (list_filter, (obj, res) => {
             try {
-                countriescodes = controller.list_countries_by_code.end (res);
+                countriescodes = controller.list_countries_by_code_async.end (res);
                 print ("Got %d items\n", countriescodes.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -62,9 +62,9 @@ int main (string[] args) {
         loop.run ();
 
         var codecs = new Gee.ArrayList<Gtk4Radio.Codec> ();
-        controller.list_codecs.begin (list_filter, (obj, res) => {
+        controller.list_codecs_async.begin (list_filter, (obj, res) => {
             try {
-                codecs = controller.list_codecs.end (res);
+                codecs = controller.list_codecs_async.end (res);
                 print ("Got %d items\n", codecs.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -74,9 +74,9 @@ int main (string[] args) {
         loop.run ();
 
         var states = new Gee.ArrayList<Gtk4Radio.State> ();
-        controller.list_states.begin ("Germany", list_filter, (obj, res) => {
+        controller.list_states_async.begin ("Germany", list_filter, (obj, res) => {
             try {
-                states = controller.list_states.end (res);
+                states = controller.list_states_async.end (res);
                 print ("Got %d items\n", states.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -86,9 +86,9 @@ int main (string[] args) {
         loop.run ();
 
         var languages = new Gee.ArrayList<Gtk4Radio.Language> ();
-        controller.list_languages.begin (list_filter, (obj, res) => {
+        controller.list_languages_async.begin (list_filter, (obj, res) => {
             try {
-                languages = controller.list_languages.end (res);
+                languages = controller.list_languages_async.end (res);
                 print ("Got %d items\n", languages.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -98,9 +98,9 @@ int main (string[] args) {
         loop.run ();
 
         var tags = new Gee.ArrayList<Gtk4Radio.Tag> ();
-        controller.list_tags.begin (list_filter, (obj, res) => {
+        controller.list_tags_async.begin (list_filter, (obj, res) => {
             try {
-                tags = controller.list_tags.end (res);
+                tags = controller.list_tags_async.end (res);
                 print ("Got %d items\n", tags.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -114,9 +114,9 @@ int main (string[] args) {
         query.language = "german";
 
         var advanced_search = new Gee.ArrayList<Gtk4Radio.Station> ();
-        controller.search_stations.begin (query, (obj, res) => {
+        controller.search_stations_async.begin (query, (obj, res) => {
             try {
-                advanced_search = controller.search_stations.end (res);
+                advanced_search = controller.search_stations_async.end (res);
                 print ("Got %d items\n", advanced_search.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -132,9 +132,9 @@ int main (string[] args) {
         filter.reverse = true;
 
         var search_by_country = new Gee.ArrayList<Gtk4Radio.Station> ();
-        controller.list_stations_by.begin (by_country, "germany", filter, (obj, res) => {
+        controller.list_stations_by_async.begin (by_country, "germany", filter, (obj, res) => {
             try {
-                search_by_country = controller.list_stations_by.end (res);
+                search_by_country = controller.list_stations_by_async.end (res);
                 print ("Got %d items\n", search_by_country.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -144,9 +144,9 @@ int main (string[] args) {
         loop.run ();
 
         var stations_by_clicks = new Gee.ArrayList<Gtk4Radio.Station> ();
-        controller.list_stations_by_clicks.begin (30, (obj, res) => {
+        controller.list_stations_by_clicks_async.begin (30, (obj, res) => {
             try {
-                stations_by_clicks = controller.list_stations_by_clicks.end (res);
+                stations_by_clicks = controller.list_stations_by_clicks_async.end (res);
                 print ("Got %d items\n", stations_by_clicks.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -156,9 +156,9 @@ int main (string[] args) {
         loop.run ();
 
         var stations_by_votes = new Gee.ArrayList<Gtk4Radio.Station> ();
-        controller.list_stations_by_votes.begin (30, (obj, res) => {
+        controller.list_stations_by_votes_async.begin (30, (obj, res) => {
             try {
-                stations_by_votes = controller.list_stations_by_votes.end (res);
+                stations_by_votes = controller.list_stations_by_votes_async.end (res);
                 print ("Got %d items\n", stations_by_votes.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -168,9 +168,9 @@ int main (string[] args) {
         loop.run ();
 
         var stations_by_recent_clicks = new Gee.ArrayList<Gtk4Radio.Station> ();
-        controller.list_stations_by_recent_click.begin (30, (obj, res) => {
+        controller.list_stations_by_recent_click_async.begin (30, (obj, res) => {
             try {
-                stations_by_recent_clicks = controller.list_stations_by_recent_click.end (res);
+                stations_by_recent_clicks = controller.list_stations_by_recent_click_async.end (res);
                 print ("Got %d items\n", stations_by_recent_clicks.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -180,9 +180,9 @@ int main (string[] args) {
         loop.run ();
 
         var stations_by_recent_change = new Gee.ArrayList<Gtk4Radio.Station> ();
-        controller.list_stations_by_recent_change.begin (30, (obj, res) => {
+        controller.list_stations_by_recent_change_async.begin (30, (obj, res) => {
             try {
-                stations_by_recent_change = controller.list_stations_by_recent_change.end (res);
+                stations_by_recent_change = controller.list_stations_by_recent_change_async.end (res);
                 print ("Got %d items\n", stations_by_recent_change.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -192,9 +192,9 @@ int main (string[] args) {
         loop.run ();
 
         var improvable_stations = new Gee.ArrayList<Gtk4Radio.Station> ();
-        controller.list_improvable_stations.begin (30, (obj, res) => {
+        controller.list_improvable_stations_async.begin (30, (obj, res) => {
             try {
-                improvable_stations = controller.list_improvable_stations.end (res);
+                improvable_stations = controller.list_improvable_stations_async.end (res);
                 print ("Got %d items\n", improvable_stations.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
@@ -204,9 +204,9 @@ int main (string[] args) {
         loop.run ();
 
         var brocken_stations = new Gee.ArrayList<Gtk4Radio.Station> ();
-        controller.list_brocken_stations.begin (30, (obj, res) => {
+        controller.list_brocken_stations_async.begin (30, (obj, res) => {
             try {
-                brocken_stations = controller.list_brocken_stations.end (res);
+                brocken_stations = controller.list_brocken_stations_async.end (res);
                 print ("Got %d items\n", brocken_stations.size);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
