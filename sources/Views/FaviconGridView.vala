@@ -34,7 +34,7 @@ public class Gtk4Radio.FaviconGridView : Gtk.Widget {
             critical ("%s\n", err.message);
         }
 
-        controller = new NetworkController (api_url, USER_AGENT);
+        controller = new NetworkController (api_url, Constants.USER_AGENT);
         favicon_downloader = new FaviconDownloader ();
 
         construct_station_list ();
@@ -51,14 +51,17 @@ public class Gtk4Radio.FaviconGridView : Gtk.Widget {
         gridview.model = new Gtk.SingleSelection (icons);
         gridview.factory = factory;
 
+        sw.vadjustment.value_changed.connect ((adjustment) => {
+            print ("value %f%.\n", Math.round (adjustment.value * 100 / (adjustment.upper - adjustment.lower)));
+        });
         sw.set_parent (this);
     }
 
     void construct_station_list () {
         var loop = new MainLoop (GLib.MainContext.default ());
-        controller.list_stations_by_votes.begin (1000, (obj, res) => {
+        controller.list_stations_by_votes_async.begin (50, (obj, res) => {
             try {
-                stations_by_votes = controller.list_stations_by_votes.end (res);
+                stations_by_votes = controller.list_stations_by_votes_async.end (res);
             } catch (Gtk4Radio.Error err) {
                 critical (err.message);
             } finally {
@@ -71,8 +74,8 @@ public class Gtk4Radio.FaviconGridView : Gtk.Widget {
     void construct_favicon_list () {
         var loop = new MainLoop (GLib.MainContext.default ());
         foreach (var station in stations_by_votes) {
-            favicon_downloader.get_favicon_pixbuf.begin (station.favicon, (obj, res) => {
-                var pixbuf = favicon_downloader.get_favicon_pixbuf.end (res);
+            favicon_downloader.get_favicon_pixbuf_async.begin (station.favicon, (obj, res) => {
+                var pixbuf = favicon_downloader.get_favicon_pixbuf_async.end (res);
                 if (pixbuf != null) icons.append (pixbuf);
                 loop.quit ();
             });

@@ -15,12 +15,12 @@ public class Gtk4Radio.StationsListModel : GLib.Object, GLib.ListModel {
         try {
             Gee.ArrayList<string> urls = endpoint.get_api_urls ("radio-browser.info", "api");
             string url = endpoint.get_fastest_api_url (urls);
-            var controller = new NetworkController (url, USER_AGENT);
+            var controller = new NetworkController (url, Constants.USER_AGENT);
 
             var loop = new MainLoop ();
-            controller.list_all_stations.begin ((obj, res) => {
+            controller.list_all_stations_async.begin ((obj, res) => {
                 try {
-                    all_stations = controller.list_all_stations.end (res);
+                    all_stations = controller.list_all_stations_async.end (res);
                 } catch (Gtk4Radio.Error err) {
                     warning ("Couldn't fetch stations: %s\n", err.message);
                 } finally {
