@@ -21,12 +21,13 @@ public class Gtk4Radio.EndpoinDiscovery : GLib.Object {
     /**
      * Get a randomized Radio-browser url from the list of available servers. If erros occur return null.
      */
-    public static string ? get_random_service_url () {
-        var endpoint = new Gtk4Radio.EndpoinDiscovery ();
+    public static string ? get_random_radiobrowser_service_url () {
+        var resolver = GLib.Resolver.get_default ();
         try {
-            var urls = endpoint.get_api_urls ("radio-browser.info", "api");
-            return urls[GLib.Random.int_range (0, urls.size)];
-        } catch (Gtk4Radio.Error err) {
+            List<InetAddress> addresses = resolver.lookup_by_name ("all.api.radio-browser.info");
+            InetAddress random_ip = addresses.nth_data (GLib.Random.int_range (0, (int) addresses.length()));
+            return "https://" + resolver.lookup_by_address (random_ip);
+        } catch (GLib.Error err) {
             warning (@"$(err.message)\n");
             return null;
         }
