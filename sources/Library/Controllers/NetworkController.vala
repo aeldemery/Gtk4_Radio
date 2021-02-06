@@ -286,7 +286,7 @@ public class Gtk4Radio.NetworkController {
         try {
             stream = yield session.send_async (msg, GLib.Priority.DEFAULT);
 
-            if (check_response_status (msg) == true) {
+            if (Utils.check_response_status_is_ok (msg) == true) {
                 return stream;
             }
         } catch (GLib.Error err) {
@@ -368,7 +368,7 @@ public class Gtk4Radio.NetworkController {
         try {
             stream = yield session.send_async (msg, GLib.Priority.DEFAULT);
 
-            if (check_response_status (msg) == true) {
+            if (Utils.check_response_status_is_ok (msg) == true) {
                 return stream;
             }
         } catch (GLib.Error err) {
@@ -714,7 +714,7 @@ public class Gtk4Radio.NetworkController {
         try {
             GLib.InputStream stream = yield session.send_async (msg, GLib.Priority.DEFAULT);
 
-            if (check_response_status (msg) == true) {
+            if (Utils.check_response_status_is_ok (msg) == true) {
                 try {
                     this.started_json_parsing ();
                     yield parser.load_from_stream_async (stream);
@@ -744,7 +744,7 @@ public class Gtk4Radio.NetworkController {
         try {
             GLib.InputStream stream = session.send (msg);
 
-            if (check_response_status (msg) == true) {
+            if (Utils.check_response_status_is_ok (msg) == true) {
                 try {
                     this.started_json_parsing ();
                     parser.load_from_stream (stream);
@@ -760,16 +760,6 @@ public class Gtk4Radio.NetworkController {
             }
         } catch (GLib.Error err) {
             throw new Error.NetworkError ("NetworkController:send_message_request:Couldn't get stations: %s\n", err.message);
-        }
-    }
-
-    bool check_response_status (Soup.Message msg) throws Gtk4Radio.Error {
-        if (msg.status_code == Soup.Status.OK) {
-            debug ("check_response_status result: %s, %s\n", msg.status_code.to_string (), msg.reason_phrase);
-            return true;
-        } else {
-            debug ("check_response_status result: %s, %s\n", msg.status_code.to_string (), msg.reason_phrase);
-            throw new Error.NetworkError ("NetworkControllert:check_response_status: %s\n", msg.reason_phrase);
         }
     }
 
