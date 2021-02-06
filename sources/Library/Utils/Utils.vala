@@ -26,11 +26,11 @@ public class Gtk4Radio.Utils : GLib.Object {
      */
     public static bool check_response_status_is_ok (Soup.Message msg) throws Gtk4Radio.Error {
         if (msg.status_code == Soup.Status.OK) {
-            debug ("check_response_status result: %s, %s\n", msg.status_code.to_string (), msg.reason_phrase);
+            debug ("check_response_status_is_ok result: %s, %s\n", msg.status_code.to_string (), msg.reason_phrase);
             return true;
         } else {
             debug ("check_response_status result: %s, %s\n", msg.status_code.to_string (), msg.reason_phrase);
-            throw new Error.NetworkError ("FaviconDownloader:check_response_status: %s\n", msg.reason_phrase);
+            throw new Error.NetworkError ("check_response_status_is_ok: %s\n", msg.reason_phrase);
         }
     }
 
