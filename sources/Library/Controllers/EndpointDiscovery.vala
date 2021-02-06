@@ -19,6 +19,20 @@ public class Gtk4Radio.EndpoinDiscovery : GLib.Object {
     }
 
     /**
+     * Get a randomized Radio-browser url from the list of available servers. If erros occur return null.
+     */
+    public static string ? get_random_url () {
+        var endpoint = new Gtk4Radio.EndpoinDiscovery ();
+        try {
+            var urls = endpoint.get_api_urls ("radio-browser.info", "api");
+            return urls[GLib.Random.int_range (0, urls.size)];
+        } catch (Gtk4Radio.Error err) {
+            warning (@"$(err.message)\n");
+            return null;
+        }
+    }
+
+    /**
      * Lookup the Endpoint service and return a list of available server names.
      *
      * @param domain the base host name, for example "example.info".
