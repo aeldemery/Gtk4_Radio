@@ -25,6 +25,7 @@ public class Gtk4Radio.FaviconGridView : Gtk.Widget {
     public FaviconGridView () {
         icons = new GLib.ListStore (typeof (Gdk.Pixbuf));
         stations_by_votes = new Gee.ArrayList<Station> ();
+        api_url = EndpoinDiscovery.get_random_service_url ();
 
         try {
             var endpoint = new EndpoinDiscovery ();

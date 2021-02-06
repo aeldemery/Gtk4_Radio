@@ -21,7 +21,7 @@ public class Gtk4Radio.EndpoinDiscovery : GLib.Object {
     /**
      * Get a randomized Radio-browser url from the list of available servers. If erros occur return null.
      */
-    public static string ? get_random_url () {
+    public static string ? get_random_service_url () {
         var endpoint = new Gtk4Radio.EndpoinDiscovery ();
         try {
             var urls = endpoint.get_api_urls ("radio-browser.info", "api");
