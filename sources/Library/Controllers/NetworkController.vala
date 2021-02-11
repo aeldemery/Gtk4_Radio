@@ -133,7 +133,7 @@ public class Gtk4Radio.NetworkController {
      * @param country the name of the country the state belongs to, please not that it's case senttive!
      * @return list of codecs and station count for each.
      */
-    public async Gee.ArrayList<State> list_states_async (string country = "", ListFilter list_filter) throws Gtk4Radio.Error {
+    public async Gee.ArrayList<State> list_states_async (string country = "", ListFilter list_filter = new ListFilter ()) throws Gtk4Radio.Error {
         string resource = "/json/states/";
         if (country != "") {
             resource += country + "/";
@@ -300,8 +300,9 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of stations in Gee.ArrayList.
      */
-    public async Gee.ArrayList<Station> list_all_stations_async () throws Gtk4Radio.Error {
+    public async Gee.ArrayList<Station> list_all_stations_async (StationListFilter filter) throws Gtk4Radio.Error {
         string resource = "/json/stations";
+        resource += filter.build_request_params ();
 
         Json.Node ? root = yield send_message_request_async (resource);
 
@@ -313,8 +314,9 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of stations in Gee.ArrayList.
      */
-    public Gee.ArrayList<Station> list_all_stations () throws Gtk4Radio.Error {
+    public Gee.ArrayList<Station> list_all_stations (StationListFilter filter) throws Gtk4Radio.Error {
         string resource = "/json/stations";
+        resource += filter.build_request_params ();
 
         Json.Node ? root = send_message_request (resource);
 
@@ -356,8 +358,9 @@ public class Gtk4Radio.NetworkController {
      *
      * @return list of stations in Gee.ArrayList.
      */
-    public async GLib.InputStream ? list_all_stations_async_stream () throws Gtk4Radio.Error {
+    public async GLib.InputStream ? list_all_stations_async_stream (StationListFilter filter) throws Gtk4Radio.Error {
         string resource = @"/json/stations";
+        resource += filter.build_request_params ();
         string uri_string = api_url + resource;
 
         GLib.InputStream stream = null;
