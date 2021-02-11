@@ -16,9 +16,9 @@ int main (string[] args) {
         var loop = new MainLoop ();
 
         // Test all stations
-
+        var station_filter = new Gtk4Radio.StationListFilter ();
         var stations = new Gee.ArrayList<Gtk4Radio.Station> ();
-        controller.list_all_stations_async.begin ((obj, res) => {
+        controller.list_all_stations_async.begin (station_filter, (obj, res) => {
             try {
                 stations = controller.list_all_stations_async.end (res);
                 print ("Got %d Stations\n", stations.size);
