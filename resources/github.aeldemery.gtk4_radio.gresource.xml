@@ -2,5 +2,11 @@
 <gresources>
     <gresource prefix = "/github/aeldemery/gtk4_radio/">
         <file>images/image-not-found.svg</file>
+        <file>images/image-not-found-multicolor.svg</file>
+        <file>images/favorite-black.svg</file>
+        <file>images/favorite-multicolor.svg</file>
+        <file>images/like-multicolor.svg</file>
+        <file>images/pause-multicolor.svg</file>
+        <file>images/play-multicolor.svg</file>
     </gresource>
 </gresources>
