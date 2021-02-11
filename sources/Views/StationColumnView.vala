@@ -105,6 +105,10 @@ public class Gtk4Radio.StationColumnView : Gtk.Widget {
         column.resizable = true;
         columnview.append_column (column);
 
+        sw.edge_reached.connect ((position_type) => {
+            model.load_next_page ();
+        });
+
         sw.set_child (columnview);
         sw.set_parent (this);
     }
