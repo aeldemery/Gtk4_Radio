@@ -25,7 +25,7 @@ public class Gtk4Radio.EndpoinDiscovery : GLib.Object {
         var resolver = GLib.Resolver.get_default ();
         try {
             List<InetAddress> addresses = resolver.lookup_by_name ("all.api.radio-browser.info");
-            InetAddress random_ip = addresses.nth_data (GLib.Random.int_range (0, (int) addresses.length()));
+            InetAddress random_ip = addresses.nth_data (GLib.Random.int_range (0, (int) addresses.length ()));
             return "https://" + resolver.lookup_by_address (random_ip);
         } catch (GLib.Error err) {
             warning (@"$(err.message)\n");
