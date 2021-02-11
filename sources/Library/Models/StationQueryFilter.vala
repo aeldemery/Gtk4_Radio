@@ -83,27 +83,40 @@ public class Gtk4Radio.StationQueryFilter : GLib.Object {
     /** do list/not list broken stations, default is false */
     public bool hidebrocken { get; set; default = false; }
 
-    GLib.StringBuilder builder;
+    /** The number of items in one page to be returned, default is 128. */
+    uint _page_size;
+    public uint page_size {
+        get {
+            return _page_size;
+        }
+        set {
+            _page_size = value; limit = page_size;
+        }
+    }
+
+    GLib.HashTable<string, string> table;
 
     public StationQueryFilter () {
-        builder = new StringBuilder ();
+        table = new GLib.HashTable<string, string> (str_hash, str_equal);
         this.notify.connect ((obj, prop) => {
             if (prop.value_type == typeof (string)) {
                 string value;
                 obj.get (prop.name, out value);
-                builder.append_printf ("_%s=%s_", prop.name, value);
+                table.insert (prop.name, value.to_string ());
             } else if (prop.value_type == typeof (bool)) {
                 bool value;
                 obj.get (prop.name, out value);
-                builder.append_printf ("_%s=%s_", prop.name, value.to_string ());
+                table.insert (prop.name, value.to_string ());
             } else if (prop.value_type == typeof (StationOrderBy)) {
                 StationOrderBy value;
                 obj.get (prop.name, out value);
-                builder.append_printf ("_%s=%s_", prop.name, value.to_string ());
+                table.insert (prop.name, value.to_string ());
             } else if (prop.value_type == typeof (uint)) {
                 uint value;
                 obj.get (prop.name, out value);
-                builder.append_printf ("_%s=%s_", prop.name, value.to_string ());
+                if (prop.name != "page-size") { // ignore page_size because it's not part of service api
+                    table.insert (prop.name, value.to_string ());
+                }
             } else {
                 assert_not_reached ();
             }
@@ -115,16 +128,42 @@ public class Gtk4Radio.StationQueryFilter : GLib.Object {
      * if multiple have been changed from the default, then append "&" as a separator
      */
     public string build_request_params () {
-        // replace _ _ placeholder with &
-        for (var i = 0; i < builder.len; i++) {
-            if ((builder.str[i] == '_') && (builder.str[i + 1] == '_')) {
-                builder.str = builder.str.splice (i, i + 2, "&");
-            }
+        assert_nonnull (table);
+
+        if (table.length == 0) {
+            return "";
         }
-        // remove leading/trailing _
-        builder.str = builder.str.replace ("_", "");
-        if (builder.str != "" && (builder.str.get_char (0) != '?')) builder.prepend_c ('?');
+
+        var builder = new StringBuilder ();
+        table.foreach ((key, val) => {
+            builder.append_printf ("%s=%s&", key, val);
+        });
+
+        if (builder.str[builder.len - 1] == '&') {
+            builder.truncate (builder.len - 1);
+        }
+        builder.prepend_c ('?');
+        print ("StationQueryFilter %s\n", builder.str);
         return builder.str;
+    }
+
+    public void previous_page () {
+        uint new_offset = this.offset - this.page_size;
+        uint new_limit = this.limit - page_size;
+        if (new_offset < 0 || new_limit < page_size) {
+            new_offset = 0;
+            new_limit = page_size;
+        }
+        this.offset = new_offset;
+        this.limit = new_limit;
+    }
+
+    public void next_page () {
+        uint new_offset = this.offset + this.page_size;
+        uint new_limit = this.limit + this.page_size;
+
+        this.offset = new_offset;
+        this.limit = new_limit;
     }
 }
 
@@ -209,32 +248,36 @@ public enum Gtk4Radio.SearchBy {
  * This is different from {@link Gtk4Radio.StationQueryFilter} because it contains limited parameters.
  */
 public class Gtk4Radio.StationListFilter : GLib.Object {
-    GLib.StringBuilder builder;
+    GLib.HashTable<string, string> table;
 
     public StationListFilter () {
-        builder = new StringBuilder ();
+        table = new GLib.HashTable<string, string> (str_hash, str_equal);
+
         this.notify.connect ((obj, prop) => {
             if (prop.value_type == typeof (string)) {
-                string value;
-                obj.get (prop.name, out value);
-                builder.append_printf ("_%s=%s_", prop.name, value);
+                // string value;
+                // obj.get (prop.name, out value);
+                // table.insert (prop.name, value.to_string());
             } else if (prop.value_type == typeof (bool)) {
                 bool value;
                 obj.get (prop.name, out value);
-                builder.append_printf ("_%s=%s_", prop.name, value.to_string ());
-            } else if (prop.value_type == typeof (StationOrderBy)) {
-                StationOrderBy value;
-                obj.get (prop.name, out value);
-                builder.append_printf ("_%s=%s_", prop.name, value.to_string ());
+                table.insert (prop.name, value.to_string ());
             } else if (prop.value_type == typeof (uint)) {
                 uint value;
                 obj.get (prop.name, out value);
-                builder.append_printf ("_%s=%s_", prop.name, value.to_string ());
+                if (prop.name != "page-size") { // ignore page_size because it's not part of service api
+                    table.insert (prop.name, value.to_string ());
+                }
+            } else if (prop.value_type == typeof (FilterOrder)) {
+                FilterOrder value;
+                obj.get (prop.name, out value);
+                table.insert (prop.name, value.to_string ());
             } else {
                 assert_not_reached ();
             }
         });
     }
+
     /**
      * OPTIONAL, name of the attribute the result list will be sorted by, default is name.
      * Possible values: name, url, homepage, favicon, tags, country, state, language, votes, codec, bitrate, lastcheckok, lastchecktime, clicktimestamp, clickcount, clicktrend, random
@@ -254,20 +297,57 @@ public class Gtk4Radio.StationListFilter : GLib.Object {
     /** do list/not list broken stations, default is false */
     public bool hidebrocken { get; set; default = false; }
 
+    /** The number of items in one page to be returned, default is 128. */
+    uint _page_size;
+    public uint page_size {
+        get {
+            return _page_size;
+        }
+        set {
+            _page_size = value; limit = page_size;
+        }
+    }
+
     /**
      * Build a string containing pairs of "key=value",
      * if multiple have been changed from the default, then append "&" as a separator
      */
     public string build_request_params () {
-        // replace _ _ placeholder with &
-        for (var i = 0; i < builder.len; i++) {
-            if ((builder.str[i] == '_') && (builder.str[i + 1] == '_')) {
-                builder.str = builder.str.splice (i, i + 2, "&");
-            }
+        assert_nonnull (table);
+
+        if (table.length == 0) {
+            return "";
         }
-        // remove leading/trailing _
-        builder.str = builder.str.replace ("_", "");
-        if (builder.str != "" && (builder.str.get_char (0) != '?')) builder.prepend_c ('?');
+
+        var builder = new StringBuilder ();
+        table.foreach ((key, val) => {
+            builder.append_printf ("%s=%s&", key, val);
+        });
+
+        if (builder.str[builder.len - 1] == '&') {
+            builder.truncate (builder.len - 1);
+        }
+        builder.prepend_c ('?');
+        print ("StationListFilter %s\n", builder.str);
         return builder.str;
+    }
+
+    public void previous_page () {
+        uint new_offset = this.offset - this.page_size;
+        uint new_limit = this.limit - page_size;
+        if (new_offset < 0 || new_limit < page_size) {
+            new_offset = 0;
+            new_limit = page_size;
+        }
+        this.offset = new_offset;
+        this.limit = new_limit;
+    }
+
+    public void next_page () {
+        uint new_offset = this.offset + this.page_size;
+        uint new_limit = this.limit + this.page_size;
+
+        this.offset = new_offset;
+        this.limit = new_limit;
     }
 }
