@@ -24,13 +24,20 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
      */
     public async Gdk.Texture ? get_favicon_texture_async (string uri, GLib.Cancellable ? cancellable = null) {
         Gdk.Texture texture = null;
+        Gdk.Pixbuf? pixbuf = null;
+
         var stream = yield send_message_image_async (uri, cancellable);
 
         if (stream == null) {
             return null;
         }
         var loader = new Gdk.PixbufLoader ();
-        var pixbuf = yield read_image_stream_async (loader, stream, cancellable);
+
+        loader.area_prepared.connect (() => {
+            pixbuf = loader.get_pixbuf ();
+        });
+        
+        yield read_image_stream_async (loader, stream, cancellable);
 
         if (pixbuf == null) {
             return null;
@@ -48,12 +55,21 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
      */
     public Gdk.Texture ? get_favicon_texture (string uri, GLib.Cancellable ? cancellable = null) {
         Gdk.Texture texture = null;
+        Gdk.Pixbuf? pixbuf = null;
+
         var stream = send_message_image (uri, cancellable);
         if (stream == null) {
             return null;
         }
+
         var loader = new Gdk.PixbufLoader ();
-        var pixbuf = read_image_stream (loader, stream, cancellable);
+        
+        loader.area_prepared.connect (() => {
+            pixbuf = loader.get_pixbuf ();
+        });
+        
+        read_image_stream (loader, stream, cancellable);
+
         if (pixbuf == null) {
             return null;
         }
@@ -101,23 +117,38 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
      * Private methods
      */
     async Gdk.Pixbuf ? fetch_pixbuf_async (string uri, GLib.Cancellable ? cancellable = null) {
+        Gdk.Pixbuf? pixbuf = null;
         var stream = yield send_message_image_async (uri, cancellable);
 
         if (stream == null) {
             return null;
         }
         var loader = new Gdk.PixbufLoader ();
-        return yield read_image_stream_async (loader, stream, cancellable);
+
+        loader.area_prepared.connect (() => {
+            pixbuf = loader.get_pixbuf ();
+        });
+        
+        yield read_image_stream_async (loader, stream, cancellable);
+        return pixbuf;
     }
 
     // Private functions
     Gdk.Pixbuf ? fetch_pixbuf (string uri, GLib.Cancellable ? cancellable = null) {
+        Gdk.Pixbuf? pixbuf = null;
+
         var stream = send_message_image (uri, cancellable);
         if (stream == null) {
             return null;
         }
         var loader = new Gdk.PixbufLoader ();
-        return read_image_stream (loader, stream, cancellable);
+
+        loader.area_prepared.connect (() => {
+            pixbuf = loader.get_pixbuf ();
+        });
+
+        read_image_stream (loader, stream, cancellable);
+        return pixbuf;
     }
 
     async GLib.DataInputStream ? send_message_image_async (string uri, GLib.Cancellable ? cancellable = null) {
@@ -161,7 +192,7 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
         }
     }
 
-    async Gdk.Pixbuf ? read_image_stream_async (Gdk.PixbufLoader loader, GLib.DataInputStream stream, GLib.Cancellable ? cancellable = null) {
+    async bool read_image_stream_async (Gdk.PixbufLoader loader, GLib.DataInputStream stream, GLib.Cancellable ? cancellable = null) {
         GLib.Bytes bytes;
         long bytes_len = 0;
 
@@ -177,7 +208,7 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
             loader.close ();
             stream.close ();
 
-            return loader.get_pixbuf ();
+            return true;
 
         } catch (GLib.Error err) {
 
@@ -189,11 +220,11 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
             }
 
             warning (@"Couldn't parse image: $(err.message).\n");
-            return null;
+            return false;
         }
     }
 
-    Gdk.Pixbuf ? read_image_stream (Gdk.PixbufLoader loader, GLib.DataInputStream stream, GLib.Cancellable ? cancellable = null) {
+    bool read_image_stream (Gdk.PixbufLoader loader, GLib.DataInputStream stream, GLib.Cancellable ? cancellable = null) {
         GLib.Bytes bytes;
         long bytes_len = 0;
 
@@ -208,7 +239,7 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
             loader.close ();
             stream.close ();
 
-            return loader.get_pixbuf ();
+            return true;
 
         } catch (GLib.Error err) {
 
@@ -220,7 +251,7 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
             }
 
             warning (@"Couldn't parse image: $(err.message).\n");
-            return null;
+            return false;
         }
     }
 }
