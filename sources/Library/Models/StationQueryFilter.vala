@@ -143,7 +143,6 @@ public class Gtk4Radio.StationQueryFilter : GLib.Object {
             builder.truncate (builder.len - 1);
         }
         builder.prepend_c ('?');
-        print ("StationQueryFilter %s\n", builder.str);
         return builder.str;
     }
 
@@ -328,7 +327,6 @@ public class Gtk4Radio.StationListFilter : GLib.Object {
             builder.truncate (builder.len - 1);
         }
         builder.prepend_c ('?');
-        print ("StationListFilter %s\n", builder.str);
         return builder.str;
     }
 
