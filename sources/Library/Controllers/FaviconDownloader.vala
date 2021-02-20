@@ -20,13 +20,13 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
      * @param url address to download from.
      * @return Gdk.Texture texture data with constant size.
      */
-    public async Gdk.Texture ? get_favicon_texture_async (string url) {
+    public async Gdk.Texture ? get_favicon_texture_async (string url, GLib.Cancellable? cancellable = null) {
         if (Utils.check_url_is_valid (url) != true) {
             return null;
         }
 
         Gdk.Texture texture = null;
-        Gdk.Pixbuf pixbuf = yield fetch_pixbuf_async (url);
+        Gdk.Pixbuf pixbuf = yield fetch_pixbuf_async (url, cancellable);
 
         if (pixbuf != null) {
             Gdk.MemoryFormat memory_format = pixbuf.has_alpha ?
@@ -45,13 +45,13 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
      * @param url address to download from.
      * @return Gdk.Texture texture data with constant size.
      */
-    public Gdk.Texture ? get_favicon_texture (string url) {
+    public Gdk.Texture ? get_favicon_texture (string url, GLib.Cancellable? cancellable = null) {
         if (Utils.check_url_is_valid (url) != true) {
             return null;
         }
 
         Gdk.Texture texture = null;
-        Gdk.Pixbuf pixbuf = fetch_pixbuf (url);
+        Gdk.Pixbuf pixbuf = fetch_pixbuf (url, cancellable);
 
         if (pixbuf != null) {
             Gdk.MemoryFormat memory_format = pixbuf.has_alpha ?
@@ -69,8 +69,8 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
      * @param url address to download from.
      * @return Gdk.Pixbuf contains pixbuf data.
      */
-    public async Gdk.Pixbuf ? get_favicon_pixbuf_async (string url) {
-        return yield fetch_pixbuf_async (url);
+    public async Gdk.Pixbuf ? get_favicon_pixbuf_async (string url, GLib.Cancellable? cancellable = null) {
+        return yield fetch_pixbuf_async (url, cancellable);
     }
 
     /**
@@ -79,8 +79,8 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
      * @param url address to download from.
      * @return Gdk.Pixbuf contains pixbuf data.
      */
-    public Gdk.Pixbuf ? get_favicon_pixbuf (string url) {
-        return fetch_pixbuf (url);
+    public Gdk.Pixbuf ? get_favicon_pixbuf (string url, GLib.Cancellable? cancellable = null) {
+        return fetch_pixbuf (url, cancellable);
     }
 
     /**
