@@ -46,7 +46,7 @@ public class Gtk4Radio.Utils : GLib.Object {
     public static bool check_content_type_is_image (Soup.Message msg, GLib.DataInputStream stream) {
         var sniffer = new Soup.ContentSniffer ();
         uint8 buffer[4096];
-        size_t size = stream.peek (buffer);
+        stream.peek (buffer);
         string content_type = sniffer.sniff (msg, new Bytes (buffer), null);
         if (content_type.has_prefix ("image")) {
             return true;
