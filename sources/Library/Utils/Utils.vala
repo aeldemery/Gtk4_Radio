@@ -26,10 +26,9 @@ public class Gtk4Radio.Utils : GLib.Object {
      */
     public static bool check_response_status_is_ok (Soup.Message msg) throws Gtk4Radio.Error {
         if (msg.status_code < Soup.Status.OK || msg.status_code > Soup.Status.PARTIAL_CONTENT) {
-            debug ("check_response_status result: %s, %s\n", msg.status_code.to_string (), msg.reason_phrase);
-            throw new Error.NetworkError ("check_response_status_is_ok: %s\n", msg.reason_phrase);
+            debug (@"Returned Status: $(msg.status_code), Reson: $(msg.reason_phrase).\n");
+            throw new Error.NetworkError (@"Returned Status: $(msg.status_code), Reson: $(msg.reason_phrase).\n");
         } else {
-            debug ("check_response_status_is_ok result: %s, %s\n", msg.status_code.to_string (), msg.reason_phrase);
             return true;
         }
     }
@@ -44,24 +43,15 @@ public class Gtk4Radio.Utils : GLib.Object {
      * @param stream the stream to check if the header method fails
      * @return true if image otherwise false
      */
-    public static bool check_content_type_is_image (Soup.Message msg, GLib.InputStream stream) {
-        Soup.MessageHeaders headers = msg.get_response_headers ();
-        string content_type = headers.get_content_type (null);
-
-        if (content_type != null && content_type.has_prefix ("image")) {
+    public static bool check_content_type_is_image (Soup.Message msg, GLib.DataInputStream stream) {
+        var sniffer = new Soup.ContentSniffer ();
+        uint8 buffer[4096];
+        size_t size = stream.peek (buffer);
+        string content_type = sniffer.sniff (msg, new Bytes (buffer), null);
+        if (content_type.has_prefix ("image")) {
             return true;
-        } else {
-            try {
-                bool uncertain = true;
-                string type = GLib.ContentType.guess (null, stream.read_bytes (4096, null).get_data (), out uncertain);
-
-                if (uncertain == false && type.contains ("image")) {
-                    return true;
-                }
-            } catch (GLib.Error err) {
-                info ("%s\n", err.message);
-            }
         }
+
         return false;
     }
 
