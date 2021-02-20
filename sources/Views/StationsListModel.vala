@@ -16,13 +16,13 @@ public class Gtk4Radio.StationsListModel : GLib.Object, GLib.ListModel {
         string url = EndpoinDiscovery.get_random_radiobrowser_service_url ();
         controller = new NetworkController (url, Constants.USER_AGENT);
         station_filter = new StationListFilter ();
-        station_filter.page_size = 64;
         stations = new Gee.ArrayList<Station> ();
 
+        this.page_size = 32;
         load_content ();
     }
 
-    private uint _page_size = 64;
+    private uint _page_size;
     public uint page_size {
         get {
             return _page_size;
@@ -30,6 +30,7 @@ public class Gtk4Radio.StationsListModel : GLib.Object, GLib.ListModel {
         set {
             uint old_size = _page_size;
             _page_size = value;
+            station_filter.page_size = _page_size;
 
             if (_page_size > old_size) {
                 /** void items_changed (uint position, uint removed, uint added) */
@@ -63,6 +64,7 @@ public class Gtk4Radio.StationsListModel : GLib.Object, GLib.ListModel {
 
     void load_content () {
         try {
+            print ("size %u\n", station_filter.page_size);
             stations = controller.list_all_stations (station_filter);
         } catch (Gtk4Radio.Error err) {
             warning (@"$(err.message)\n");
