@@ -102,7 +102,7 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
     /*
      * Private methods
      */
-    async Gdk.Pixbuf ? fetch_pixbuf_async (string url) {
+    async Gdk.Pixbuf ? fetch_pixbuf_async (string url, GLib.Cancellable ? cancellable = null) {
         if (Utils.check_url_is_valid (url) != true) {
             return null;
         }
@@ -115,7 +115,17 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
                 GLib.InputStream stream = yield session.send_async (message, GLib.Priority.DEFAULT);
 
                 if (Utils.check_response_status_is_ok (message) && Utils.check_content_type_is_image (message, stream)) {
-                    return pixbuf = yield new Gdk.Pixbuf.from_stream_async (stream);
+                    Gdk.PixbufLoader loader = new Gdk.PixbufLoader ();
+                    GLib.Bytes bytes;
+                    long bytes_len = 0;
+                    do {
+                        bytes = stream.read_bytes (4096, cancellable);
+                        bytes_len = bytes.length;
+                        loader.write_bytes (bytes);
+                    } while ( bytes_len > 0);
+                    // return pixbuf = yield new Gdk.Pixbuf.from_stream_async (stream);
+                    loader.close ();
+                    return loader.get_pixbuf ();
                 } else {
                     return null;
                 }
@@ -127,7 +137,7 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
     }
 
     // Private functions
-    Gdk.Pixbuf ? fetch_pixbuf (string url) {
+    Gdk.Pixbuf ? fetch_pixbuf (string url, GLib.Cancellable? cancellable = null) {
         if (Utils.check_url_is_valid (url) != true) {
             return null;
         }
@@ -140,7 +150,18 @@ public class Gtk4Radio.FaviconDownloader : GLib.Object {
                 GLib.InputStream stream = session.send (message);
 
                 if (Utils.check_response_status_is_ok (message) && Utils.check_content_type_is_image (message, stream)) {
-                    return pixbuf = new Gdk.Pixbuf.from_stream (stream);
+                    // return pixbuf = new Gdk.Pixbuf.from_stream (stream);
+                    Gdk.PixbufLoader loader = new Gdk.PixbufLoader ();
+                    GLib.Bytes bytes;
+                    long bytes_len = 0;
+                    do {
+                        bytes = stream.read_bytes (4096, cancellable);
+                        bytes_len = bytes.length;
+                        loader.write_bytes (bytes);
+                    } while ( bytes_len > 0);
+                    // return pixbuf = yield new Gdk.Pixbuf.from_stream_async (stream);
+                    loader.close ();
+                    return loader.get_pixbuf ();
                 } else {
                     return null;
                 }
